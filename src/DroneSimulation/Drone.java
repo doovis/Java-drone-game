@@ -3,15 +3,14 @@ package DroneSimulation;
 public class Drone {	// Drone class
 	int x, y;			// Coordinates
 	int id = 0;			// Identifier
-	static Direction.dir dir;		// Direction
+	Direction.direction dir;		// Direction
 	public static int count = 0;	// Id increment helper
 	
-	
-	Drone(int X, int Y, Direction d) {
+	Drone(int X, int Y, Direction.direction d) {
 		this.x = X;
 		this.y = Y;
 		this.id = count++;
-		Drone.dir = DroneSimulation.Direction.dir.SOUTH;
+		this.dir = d;
 	}
 	
 	/**
@@ -32,12 +31,11 @@ public class Drone {	// Drone class
 	}
 	
 	public String toString() {
-		return "Drone " + id + " is at " + x + ", " + y;
+		return "Drone " + id + " is at " + x + ", " + y + ", and points to " + dir;
 	}
 	
 	public static void main(String[] args) {
-		Direction dire = new Direction(dir);
-		Drone d = new Drone(5, 2, dire);	// Drone instance
-		System.out.println(d.toString());	// Print where it is		
+//		Drone d = new Drone(5, 2, Direction.direction.SOUTH);	// Drone instance
+//		System.out.println(d.toString());	// Print where it is		
 	}
 }

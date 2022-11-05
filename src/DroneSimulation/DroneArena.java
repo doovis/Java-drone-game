@@ -3,6 +3,8 @@ package DroneSimulation;
 import java.util.ArrayList;
 import java.util.Random;
 
+import DroneSimulation.Direction.direction;
+
 public class DroneArena {	// Drone arena
 	private int xSize, ySize;		// Arena size
 	ArrayList<Drone> drn;	// Drones array
@@ -36,7 +38,7 @@ public class DroneArena {	// Drone arena
 		} while (getDroneAt(x, y) != null && count < drn.size());
 		
 		if (getDroneAt(x, y) == null) {
-			this.drn.add(new Drone(x, y));						
+			this.drn.add(new Drone(x, y, direction.values()[randomGenerator.nextInt(direction.values().length)]));						
 		}
 		
 	}
@@ -67,42 +69,19 @@ public class DroneArena {	// Drone arena
 		}
 	}
 	
-	
-//	public void drawArena(String ch) {
-//		for (int i = 0; i < ySize + 2; i++) {
-//			System.out.print(ch);
-//			for (int j = 0; j < xSize; j++) {
-//				for (int k = 0; k < drn.size(); k++) {
-//					if (j + 1 == drn.get(k).x && i == drn.get(k).y) {					
-//						System.out.print(" D ");
-//						j++;
-//					}
-//				} 
-//				if (j >= xSize) {
-//					continue;
-//				} else if (i == 0 || i == ySize + 1) {					
-//					System.out.print(" " + ch + " ");
-//				} else {
-//					System.out.print("   ");
-//				}
-//			}
-//			System.out.println(ch);
-//		}
-//	}
-	
 	public String toString() {
 		String str = "Arena size: x = " + xSize + " y = " + ySize + "\n\n";
 
 		for (Drone i : drn) {
-			str += "Drone " + i.id + ": ";
-			str += "x = " + i.x + " y = " + i.y + "\n";
+			str += "Drone " + i.id + ": x = " + i.x + "; y = "
+					+ i.y + "; direction = " + i.dir + "\n";
 		}
 		return str;
 	}
 	
 	public static void main(String[] args) {
 //		DroneArena a = new DroneArena(2, 2);
-//
+
 //		for (int i = 0; i < 4; i++) {
 //			a.addDrone();			
 //		}

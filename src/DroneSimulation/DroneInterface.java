@@ -17,7 +17,7 @@ public class DroneInterface {
 		
 	    char ch = ' ';
 	    do {
-	    	System.out.print("Enter (A)dd drone, get (I)nformation or e(X)it > ");
+	    	System.out.print("Enter (A)dd drone, get (I)nformation, (D)isplay arena or e(X)it > ");
 	    	ch = s.next().charAt(0);
 	    	s.nextLine();
 	    	switch (ch) {
@@ -33,7 +33,7 @@ public class DroneInterface {
 					break;
 	    		case 'D':
 	    		case 'd':
-	    			doDisplay();
+	    			doDisplay();		// Display arena with drones inside
 	    			break;
 	    	}
 		} while (ch != 'X');						// test if end
@@ -48,13 +48,13 @@ public class DroneInterface {
 	void doDisplay() {
 		int xSizeArena = myArena.xSize();
 		int ySizeArena = myArena.ySize();
-		ConsoleCanvas cnv = new ConsoleCanvas(xSizeArena, ySizeArena);
+		ConsoleCanvas cnv = new ConsoleCanvas(xSizeArena, ySizeArena);	// Creating appropriate size canvas object 
 		
 		myArena.showDrones(cnv);
 		System.out.print(cnv.toString());
 	}
 	
 	public static void main(String[] args) {
-		DroneInterface r = new DroneInterface();	// just call the interface
+		new DroneInterface();	// just call the interface
 	}
 }
