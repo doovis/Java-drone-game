@@ -10,19 +10,21 @@ public class Direction {
 		SOUTH,
 		WEST;
 		
-		public direction randomdirection() {
+		public direction randomDirection() {
 			Random random = new Random();
 			return direction.values()[random.nextInt(direction.values().length)];
 		}
 	
-	//	public direction next() {
-	//		return ;
-	//	}
+		public direction next(direction currentDir) {
+			int cur = currentDir.ordinal();
+			return direction.values()[(cur + 1) % 4];
+		}
 	};
 
 	
 	public static void main(String[] args) {
-//		System.out.println(da);
+//		direction a = direction.SOUTH;
+//		System.out.println(a.next(a));
 	}
 	
 }

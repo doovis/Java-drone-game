@@ -38,7 +38,8 @@ public class DroneArena {	// Drone arena
 		} while (getDroneAt(x, y) != null && count < drn.size());
 		
 		if (getDroneAt(x, y) == null) {
-			this.drn.add(new Drone(x, y, direction.values()[randomGenerator.nextInt(direction.values().length)]));						
+//			direction dir = direction.SOUTH;
+			this.drn.add(new Drone(x, y, direction.values()[randomGenerator.nextInt(direction.values().length)]));
 		}
 		
 	}

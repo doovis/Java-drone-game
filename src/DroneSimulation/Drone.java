@@ -26,6 +26,10 @@ public class Drone {	// Drone class
 		return false;			
 	}
 	
+	public void tryToMove() {
+		
+	}
+	
 	public void displayDrone(ConsoleCanvas c) {
 		c.showIt(this.x, this.y, 'D');
 	}
