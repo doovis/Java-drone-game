@@ -2,22 +2,33 @@ package DroneSimulation;
 
 import java.util.Random;
 
-public class Direction {	
-	
+public class Direction {
+	/**
+	 * direction enum for drones
+	 *
+	 */
 	enum direction {
 		NORTH,
 		EAST,
 		SOUTH,
 		WEST;
 		
+		/**
+		 * picking random direction from enum
+		 * @return
+		 */
 		public direction randomDirection() {
 			Random random = new Random();
-			return direction.values()[random.nextInt(direction.values().length)];
+			return values()[random.nextInt(values().length)];
 		}
 	
+		/**
+		 * picking next direction in NESW sequence
+		 * @param currentDir
+		 * @return
+		 */
 		public direction next(direction currentDir) {
-			int cur = currentDir.ordinal();
-			return direction.values()[(cur + 1) % 4];
+			return values()[(currentDir.ordinal() + 1) % values().length];
 		}
 	};
 
