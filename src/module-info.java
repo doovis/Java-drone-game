@@ -6,4 +6,5 @@
  *
  */
 module Drone_simulator {
+	requires java.desktop;
 }
