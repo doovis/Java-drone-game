@@ -133,20 +133,23 @@ public class DroneInterface {
 	    		case 'l':
 	    			ArrayList<String> data = readingFromFile();
 	    			
-	    			String[] arenaSize = data.get(0).split(" ");	// Splitting first line string when whitespace detected
-	    			
-	    			// reinitialising new arena
-	    			myArena = new DroneArena(Integer.parseInt(arenaSize[0].trim()), Integer.parseInt(arenaSize[1].trim()));
+	    			try {
+	    				String[] arenaSize = data.get(0).split(" ");	// Splitting first line string when whitespace detected
 
-	    			// Populating arena with drones
-	    			for (int i = 1; i < data.size(); i++) {
-	    				String[] droneInfo = data.get(i).split(" ");
-	    					    				
-	    				Drone drone = new Drone(Integer.parseInt(droneInfo[0]), Integer.parseInt(droneInfo[1]), Direction.direction.valueOf(droneInfo[2].trim()));
-	    				
-	    				myArena.drn.add(drone);
+	    				// reinitialising new arena
+	    				myArena = new DroneArena(Integer.parseInt(arenaSize[0].trim()), Integer.parseInt(arenaSize[1].trim()));
+
+	    				// Populating arena with drones
+	    				for (int i = 1; i < data.size(); i++) {
+	    					String[] droneInfo = data.get(i).split(" ");
+	    					
+	    					Drone drone = new Drone(Integer.parseInt(droneInfo[0]), Integer.parseInt(droneInfo[1]), Direction.direction.valueOf(droneInfo[2].trim()));
+	    					
+	    					myArena.drn.add(drone);
+	    				}
+	    			} catch (IndexOutOfBoundsException i) {
+	    				i.getMessage();
 	    			}
-	    			
 	    			break;
     			/**
     			 * exiting program
@@ -224,6 +227,7 @@ public class DroneInterface {
 	 */
 	public ArrayList<String> readingFromFile() {
 		JFileChooser Chooser = new JFileChooser();
+		Chooser.setFileFilter(filter);
 		int value = Chooser.showOpenDialog(null);
 		ArrayList<String> str = new ArrayList<String>();
 		String input = "";
