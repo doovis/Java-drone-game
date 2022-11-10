@@ -55,7 +55,7 @@ public class DroneArena {	// Drone arena
 		} while (getDroneAt(x, y) != null && count < drn.size());
 		
 		if (getDroneAt(x, y) == null) {
-			this.drn.add(new Drone(x, y, direction.values()[randomGenerator.nextInt(direction.values().length)]));
+			this.drn.add(new Drone(x, y, direction.randomDirection()));
 		}
 		
 	}
@@ -155,12 +155,14 @@ public class DroneArena {	// Drone arena
 	}
 	
 	public static void main(String[] args) {
-//		DroneArena a = new DroneArena(2, 2);
-//		a.addDrone();			
+		DroneArena a = new DroneArena(2, 2);
+		a.addDrone();			
+		a.addDrone();			
+		a.addDrone();			
 //		a.canMoveHere(null, xSize, xSize);
 //		for (int i = 0; i < 4; i++) {
 //			a.addDrone();			
 //		}
-//		System.out.println(a.toString());	//Printing arena/drones info in text format		
+		System.out.println(a.toString());	//Printing arena/drones info in text format		
 	}
 }

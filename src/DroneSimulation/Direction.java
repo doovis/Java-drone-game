@@ -17,7 +17,7 @@ public class Direction {
 		 * picking random direction from enum
 		 * @return
 		 */
-		public direction randomDirection() {
+		public static direction randomDirection() {
 			Random random = new Random();
 			return values()[random.nextInt(values().length)];
 		}

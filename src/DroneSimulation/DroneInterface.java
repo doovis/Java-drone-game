@@ -1,6 +1,7 @@
 package DroneSimulation;
 
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -68,9 +69,13 @@ public class DroneInterface {
 	    		 */
 	    		case 'M':
 	    		case 'm':
-	    			myArena.moveAllDrones();
-	    			doDisplay();				// Display arena with drones inside
-	    			System.out.print(myArena.toString());
+	    			if (myArena.drn.size() != 0) {
+	    				myArena.moveAllDrones();	    				
+	    				doDisplay();				// Display arena with drones inside
+	    				System.out.print(myArena.toString());
+	    			} else {
+	    				System.out.print("Arena does not contain any drones...\n\n");
+	    			}
 	    			break;
 	    			
 	    		/**
@@ -79,17 +84,21 @@ public class DroneInterface {
 	    		case 'S':
 	    		case 's':
 	    			int count = 0;
-	    			while (count < 10) {
-	    				
-	    				myArena.moveAllDrones();
-	    				System.out.print(myArena.toString());
-	    				doDisplay();				// Display arena with drones inside
-	    				count++;
-	    				try {
-	    					Thread.sleep(150);		
-	    				} catch (InterruptedException e) {
-	    					e.printStackTrace();
-	    				}
+	    			if (myArena.drn.size() != 0) {
+		    			while (count < 10) {
+		    				
+		    				myArena.moveAllDrones();
+		    				System.out.print(myArena.toString());
+		    				doDisplay();				// Display arena with drones inside
+		    				count++;
+		    				try {
+		    					Thread.sleep(150);		
+		    				} catch (InterruptedException e) {
+		    					e.printStackTrace();
+		    				}
+		    			}
+	    			} else {
+	    				System.out.println("Arena does not contain any drones...\n\n");
 	    			}
 	    			break;
 	    			
@@ -98,13 +107,18 @@ public class DroneInterface {
 	    		 */
 	    		case 'N':
 	    		case 'n':
-	    			// Taking x, y input
-	    			System.out.println("Enter x size of the new arena: ");
-	    			arenaXInput = s.nextInt();
-	    			s.nextLine();
-	    			System.out.println("Enter y size of the new arena: ");
-	    			arenaYInput = s.nextInt();
-	    			s.nextLine();
+	    			try {
+		    			// Taking x, y input
+		    			System.out.println("Enter x size of the new arena: ");
+		    			arenaXInput = s.nextInt();
+		    			s.nextLine();
+		    			System.out.println("Enter y size of the new arena: ");
+		    			arenaYInput = s.nextInt();
+		    			s.nextLine();
+	    			} catch (InputMismatchException i) {
+	    				System.out.println("Something went wrong...\n\n");
+	    				break;
+	    			}
 	    			
 	    			myArena = new DroneArena(arenaXInput, arenaYInput);
 	    			
@@ -216,9 +230,9 @@ public class DroneInterface {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			System.out.println("Arena saved to a file: " + file.getName());
+			System.out.println("Arena saved to a file: " + file.getName() + "\n");
 		} else {
-			System.out.println("Arena saving was unsuccessful");			
+			System.out.println("Arena saving was unsuccessful...\n");			
 		}
 	}
 
@@ -272,9 +286,9 @@ public class DroneInterface {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			System.out.println("Arena saved to a file: " + file.getName());
+			System.out.println("Arena loaded from a file: " + file.getName() + "\n");
 		} else {
-			System.out.println("Arena saving was unsuccessful");			
+			System.out.println("Arena loading was unsuccessful...\n\n");			
 		}
 		return str;
 	}
