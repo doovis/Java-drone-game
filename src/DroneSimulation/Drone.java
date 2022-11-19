@@ -1,10 +1,14 @@
 package DroneSimulation;
 
+import javafx.scene.image.Image;
+
 public class Drone {				// Drone class
-	private int x, dx, y, dy, id;	// Coordinates, delta x and y, identifier
+	private double x, dx, y, dy;	// Coordinates, delta x and y
+	private int id, xSize, ySize;	// identifier, size
 	Direction.direction dir;		// Direction
 	private static int count = 0;	// Id increment helper
-	
+	Image drone;
+
 	
 	/**
 	 * Drone constructor initialising coordinates, deltas, 
@@ -13,20 +17,23 @@ public class Drone {				// Drone class
 	 * @param Y
 	 * @param d
 	 */
-	Drone(int X, int Y, Direction.direction d) {
+	Drone(double X, double Y, Direction.direction d) {
 		this.x = X;
 		this.y = Y;
-		this.dx = 1;
-		this.dy = 1;
+		this.dx = 2;
+		this.dy = 2;
 		this.id = count++;
 		this.dir = d;
+		this.xSize = 50;
+		this.ySize = 50;
+		drone = new Image(getClass().getResourceAsStream("./drone.png"));
 	}
 	
 	/**
 	 * get value of x
 	 * @return x
 	 */
-	public int getX() {
+	public double getX() {
 		return x;
 	}
 	
@@ -34,10 +41,26 @@ public class Drone {				// Drone class
 	 * get value of y
 	 * @return y
 	 */
-	public int getY() {
+	public double getY() {
 		return y;
 	}
-	
+
+	/**
+	 * get value of y
+	 * @return y
+	 */
+	public int getXSize() {
+		return xSize;
+	}
+
+	/**
+	 * get value of y
+	 * @return y
+	 */
+	public int getYSize() {
+		return ySize;
+	}
+
 	/**
 	 * get value of id
 	 * @return id
@@ -51,7 +74,7 @@ public class Drone {				// Drone class
 	 * @param X
 	 * @param Y
 	 */
-	public void setXY(int X, int Y) {
+	public void setXY(double X, double Y) {
 		x = X;
 		y = Y;
 	}
@@ -62,7 +85,11 @@ public class Drone {				// Drone class
 	 * @param sy	y position
 	 * @return		true if drone is at sx,sy, false otherwise
 	 */
-	public boolean isHere(int sx, int sy) {
+	public boolean isHere(double sx, double sy) {
+//		if (this.x == sx || this.y < sx) {
+//			return true;			
+//		}
+
 		if (this.x == sx && this.y == sy) {
 			return true;			
 		}
@@ -75,7 +102,7 @@ public class Drone {				// Drone class
 	 */
 	public void tryToMove(DroneArena arena) {
 
-		if (arena.canMoveHere(dir, x, y)) {	// if can move update x, y
+		if (arena.canMoveHere(dir, x, y, xSize, ySize)) {	// if can move update x, y
 			switch (this.dir) {				// calculate next x, y position
 				case NORTH:
 						y -= dy;
@@ -99,8 +126,8 @@ public class Drone {				// Drone class
 	 * displays drone as 'D' using ConsoleCanvas method 'showIt'
 	 * @param c
 	 */
-	public void displayDrone(ConsoleCanvas c) {
-		c.showIt(this.x, this.y, 'D');
+	public void displayDrone(UICanvas c) {
+		c.drawImage(drone, this.x, this.y, 50, 50);
 	}
 	
 	/**

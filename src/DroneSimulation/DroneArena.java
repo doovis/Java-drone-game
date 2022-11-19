@@ -4,11 +4,15 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import DroneSimulation.Direction.direction;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
 
 public class DroneArena {	// Drone arena
 	private int xSize, ySize;		// Arena size
 	ArrayList<Drone> drn;	// Drones array
 	Random randomGenerator;	// Random object
+//	Image drone;
 	
 	/**
 	 * drone arena constructor initialising arena's size, 
@@ -21,6 +25,7 @@ public class DroneArena {	// Drone arena
 		this.ySize = h;
 		randomGenerator = new Random();
 		drn = new ArrayList<Drone>();
+//		drone = new Image(getClass().getResourceAsStream("./drone.png"));
 	}
 	
 	/**
@@ -38,6 +43,17 @@ public class DroneArena {	// Drone arena
 	public int ySize() {
 		return ySize;
 	}
+	
+	public void update() {
+		moveAllDrones();		
+	}
+
+	public void drawObjects(UICanvas canvas, Canvas interfaceCanvas) {
+		canvas.clearCanvas();
+		interfaceCanvas.getGraphicsContext2D().setFill(Color.color(0.9, 0.9, 0.9, 1));
+		interfaceCanvas.getGraphicsContext2D().fillRect(0, 0, xSize, ySize);
+		showDrones(canvas);
+	}
 
 	/**
 	 * add drone to the list with random coordinates
@@ -48,8 +64,8 @@ public class DroneArena {	// Drone arena
 		
 		do {
 			count++;
-			x = randomGenerator.nextInt(this.xSize) + 1;
-			y = randomGenerator.nextInt(this.ySize) + 1;
+			x = randomGenerator.nextInt(this.xSize - 50);
+			y = randomGenerator.nextInt(this.ySize - 50);
 			
 			// can delete drn.size check, but overflowing drone field will not be handled
 		} while (getDroneAt(x, y) != null && count < drn.size());
@@ -66,7 +82,7 @@ public class DroneArena {	// Drone arena
 	 * @param y
 	 * @return null if no Drone there, otherwise return drone
 	 */
-	public Drone getDroneAt(int x, int y) {
+	public Drone getDroneAt(double x, double y) {
 		Drone drone = null;
 		
 		for(Drone d : drn) {
@@ -82,7 +98,7 @@ public class DroneArena {	// Drone arena
 	 * display drones present in the list
 	 * @param c
 	 */
-	public void showDrones(ConsoleCanvas c) {
+	public void showDrones(UICanvas c) {
 		for (Drone d : drn) {
 			d.displayDrone(c);
 		}
@@ -104,34 +120,34 @@ public class DroneArena {	// Drone arena
 	 * @param y
 	 * @return
 	 */
-	public boolean canMoveHere(Direction.direction dir, int x, int y) {
+	public boolean canMoveHere(Direction.direction dir, double x, double y, int droneXSize, int droneYSize) {
 		boolean canMove = true;
 		
 		// Collision detection
 		switch (dir) {
 			case NORTH:
-				if (y < 2)		// If outside boundaries
+				if (y < 1)		// If outside boundaries
 					return canMove = false;
 				if (getDroneAt(x, y - 1) != null)	// If drone is in the way
 					return canMove = false;
 				break;
 				
 			case EAST:
-				if (x >= xSize)	// If outside boundaries
+				if (x + droneXSize >= xSize)	// If outside boundaries
 					return canMove = false;
 				if (getDroneAt(x + 1, y) != null)	// If drone is in the way
 					return canMove = false;	
 				break;
 				
 			case SOUTH:
-				if (y >= ySize)	// If outside boundaries
+				if (y + droneYSize >= ySize)	// If outside boundaries
 					return canMove = false;
 				if (getDroneAt(x, y + 1) != null)	// If drone is in the way
 					return canMove = false;			
 				break;
 				
 			case WEST:
-				if (x < 2)	// If outside boundaries
+				if (x < 1)	// If outside boundaries
 					return canMove = false;
 				if (getDroneAt(x - 1, y) != null)	// If drone is in the way
 					return canMove = false;	
@@ -156,9 +172,9 @@ public class DroneArena {	// Drone arena
 	
 	public static void main(String[] args) {
 		DroneArena a = new DroneArena(2, 2);
-		a.addDrone();			
-		a.addDrone();			
-		a.addDrone();			
+//		a.addDrone();			
+//		a.addDrone();			
+//		a.addDrone();			
 //		a.canMoveHere(null, xSize, xSize);
 //		for (int i = 0; i < 4; i++) {
 //			a.addDrone();			
