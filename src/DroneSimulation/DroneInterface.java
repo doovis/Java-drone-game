@@ -1,6 +1,7 @@
 package DroneSimulation;
 
 import java.util.ArrayList;
+
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.io.BufferedReader;
@@ -306,6 +307,6 @@ public class DroneInterface {
 	}
 	
 	public static void main(String[] args) {
-		new DroneInterface();	// call to the interface
+		new DroneInterface();
 	}
 }
