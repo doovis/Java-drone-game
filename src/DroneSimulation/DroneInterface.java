@@ -6,6 +6,7 @@ import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -46,12 +47,12 @@ import javax.swing.filechooser.FileFilter;
 public class DroneInterface extends Application {
 	int canvasWidth = 512;
 	int canvasHeight = 512;
+	boolean animationOn = false;
 	VBox rtPane;
 	UICanvas cnv;
 	DroneArena arena;
 	DroneBorderPane canvasBroders;
-	boolean animationOn = false;
-	Image drone = new Image(getClass().getResourceAsStream("./drone.png"));
+//	Image drone = new Image(getClass().getResourceAsStream("./drone.png"));
 //	private Scanner s;						// scanner used for input from user
 //	private DroneArena myArena;				// arena in which drones are shown
 
@@ -407,6 +408,13 @@ public class DroneInterface extends Application {
 		arena = new DroneArena(canvasWidth, canvasHeight);
 
 		rtPane = new VBox();
+		String cssDroneList = "-fx-border-color: red;\n" +
+				                "-fx-margin: 50;\n" +
+				                "-fx-border-insets: 5;\n" +
+				                "-fx-border-width: 3;\n";
+		rtPane.setPrefSize(canvasWidth / 3, canvasHeight);
+		rtPane.setAlignment(Pos.TOP_LEFT);
+		rtPane.setStyle(cssDroneList);
 		rtPane.getChildren().addAll(new Label("drone1"));
 		
 		canvasBroders = new DroneBorderPane(arena);

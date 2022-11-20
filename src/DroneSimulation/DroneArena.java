@@ -25,7 +25,6 @@ public class DroneArena {	// Drone arena
 		this.ySize = h;
 		randomGenerator = new Random();
 		drn = new ArrayList<Drone>();
-//		drone = new Image(getClass().getResourceAsStream("./drone.png"));
 	}
 	
 	/**
@@ -68,30 +67,12 @@ public class DroneArena {	// Drone arena
 			y = randomGenerator.nextInt(this.ySize - 50);
 			
 			// can delete drn.size check, but overflowing drone field will not be handled
-		} while (getDroneAt(x, y) != null && count < drn.size());
+		} while (getDroneAt(x, y, Drone.getXSize(), Drone.getYSize(), 0) != null && count < drn.size());
 		
-		if (getDroneAt(x, y) == null) {
+		if (getDroneAt(x, y, Drone.getXSize(), Drone.getYSize(), 0) == null) {
 			this.drn.add(new Drone(x, y, direction.randomDirection()));
 		}
 		
-	}
-	
-	/**
-	 * search list of drones to see if there is a drone at x,y
-	 * @param x
-	 * @param y
-	 * @return null if no Drone there, otherwise return drone
-	 */
-	public Drone getDroneAt(double x, double y) {
-		Drone drone = null;
-		
-		for(Drone d : drn) {
-			// If drone is at the location - return it
-			if (d.isHere(x, y)) {
-				return d;
-			}
-		}
-		return drone;
 	}
 	
 	/**
@@ -114,13 +95,31 @@ public class DroneArena {	// Drone arena
 	}
 	
 	/**
+	 * search list of drones to see if there is a drone at x,y
+	 * @param x
+	 * @param y
+	 * @return null if no Drone there, otherwise return drone
+	 */
+	public Drone getDroneAt(double x, double y, int drnXSize, int drnYSize, int id) {
+		Drone drone = null;
+		
+		for(Drone d : drn) {
+			// If drone is at the location - return it
+			if (d.isHere(x, y, drnXSize, drnYSize) && d.getID() != id) {
+				return d;
+			}
+		}
+		return drone;
+	}
+	
+	/**
 	 * checking if the direction drone is moving towards is not obstructed
 	 * @param dir
 	 * @param x
 	 * @param y
 	 * @return
 	 */
-	public boolean canMoveHere(Direction.direction dir, double x, double y, int droneXSize, int droneYSize) {
+	public boolean canMoveHere(Direction.direction dir, double x, double y, int droneXSize, int droneYSize, int id) {
 		boolean canMove = true;
 		
 		// Collision detection
@@ -128,28 +127,28 @@ public class DroneArena {	// Drone arena
 			case NORTH:
 				if (y < 1)		// If outside boundaries
 					return canMove = false;
-				if (getDroneAt(x, y - 1) != null)	// If drone is in the way
+				if (getDroneAt(x, y - 1, droneXSize, droneYSize, id) != null)	// If drone is in the way
 					return canMove = false;
 				break;
 				
 			case EAST:
 				if (x + droneXSize >= xSize)	// If outside boundaries
 					return canMove = false;
-				if (getDroneAt(x + 1, y) != null)	// If drone is in the way
+				if (getDroneAt(x + 1, y, droneXSize, droneYSize, id) != null)	// If drone is in the way
 					return canMove = false;	
 				break;
 				
 			case SOUTH:
 				if (y + droneYSize >= ySize)	// If outside boundaries
 					return canMove = false;
-				if (getDroneAt(x, y + 1) != null)	// If drone is in the way
+				if (getDroneAt(x, y + 1, droneXSize, droneYSize, id) != null)	// If drone is in the way
 					return canMove = false;			
 				break;
 				
 			case WEST:
 				if (x < 1)	// If outside boundaries
 					return canMove = false;
-				if (getDroneAt(x - 1, y) != null)	// If drone is in the way
+				if (getDroneAt(x - 1, y, droneXSize, droneYSize, id) != null)	// If drone is in the way
 					return canMove = false;	
 				break;
 		}

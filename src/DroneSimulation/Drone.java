@@ -4,7 +4,9 @@ import javafx.scene.image.Image;
 
 public class Drone {				// Drone class
 	private double x, dx, y, dy;	// Coordinates, delta x and y
-	private int id, xSize, ySize;	// identifier, size
+	private int id;	// identifier
+	private static int drnxSize;
+	private static int drnySize;
 	Direction.direction dir;		// Direction
 	private static int count = 0;	// Id increment helper
 	Image drone;
@@ -24,8 +26,8 @@ public class Drone {				// Drone class
 		this.dy = 2;
 		this.id = count++;
 		this.dir = d;
-		this.xSize = 50;
-		this.ySize = 50;
+		this.drnxSize = 50;
+		this.drnySize = 50;
 		drone = new Image(getClass().getResourceAsStream("./drone.png"));
 	}
 	
@@ -49,16 +51,16 @@ public class Drone {				// Drone class
 	 * get value of y
 	 * @return y
 	 */
-	public int getXSize() {
-		return xSize;
+	public static int getXSize() {
+		return drnxSize;
 	}
 
 	/**
 	 * get value of y
 	 * @return y
 	 */
-	public int getYSize() {
-		return ySize;
+	public static int getYSize() {
+		return drnySize;
 	}
 
 	/**
@@ -85,14 +87,15 @@ public class Drone {				// Drone class
 	 * @param sy	y position
 	 * @return		true if drone is at sx,sy, false otherwise
 	 */
-	public boolean isHere(double sx, double sy) {
-//		if (this.x == sx || this.y < sx) {
-//			return true;			
-//		}
-
-		if (this.x == sx && this.y == sy) {
-			return true;			
+	public boolean isHere(double sx, double sy, int drnXSize, int drnYSize) {
+		// Checking each side of the drones
+		if (this.x < sx + drnXSize
+			&& this.x + drnxSize > sx
+			&& this.y < sy + drnYSize
+			&& this.y + drnySize > sy) {
+			return true;
 		}
+		
 		return false;			
 	}
 	
@@ -102,7 +105,7 @@ public class Drone {				// Drone class
 	 */
 	public void tryToMove(DroneArena arena) {
 
-		if (arena.canMoveHere(dir, x, y, xSize, ySize)) {	// if can move update x, y
+		if (arena.canMoveHere(dir, x, y, drnxSize, drnySize, id)) {	// if can move update x, y
 			switch (this.dir) {				// calculate next x, y position
 				case NORTH:
 						y -= dy;
@@ -127,7 +130,7 @@ public class Drone {				// Drone class
 	 * @param c
 	 */
 	public void displayDrone(UICanvas c) {
-		c.drawImage(drone, this.x, this.y, 50, 50);
+		c.drawImage(drone, this.x, this.y, drnxSize, drnySize);
 	}
 	
 	/**
