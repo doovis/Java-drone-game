@@ -9,6 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 
 public class UICanvas extends Application {
@@ -37,18 +38,12 @@ public class UICanvas extends Application {
 	 * @param width
 	 * @param height
 	 */
-	public void drawImage(Image img, double x, double y, double width, double height) {
+	public void drawImage(Image img, double angle, double x, double y, double width, double height) {
+//		gc.save();
+//		Rotate r = new Rotate(22, x, y);
+//		gc.setTransform(r.getMxx(), r.getMyx(), r.getMxy(), r.getMyy(), r.getTx(), r.getTy());
 		gc.drawImage(img, x, y, width, height);
-	}
-
-	/**
-	 * Drawing an image in x,y location
-	 * @param img
-	 * @param x
-	 * @param y
-	 */
-	public void drawImage(Image img, int x, int y) {
-		gc.drawImage(img, x, y);
+//		gc.restore();
 	}
 
 	/**

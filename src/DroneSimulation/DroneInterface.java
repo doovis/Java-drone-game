@@ -6,6 +6,7 @@ import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -17,18 +18,25 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
+import java.awt.Paint;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -42,16 +50,19 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import javax.swing.JFileChooser;
+import javax.swing.JScrollPane;
 import javax.swing.filechooser.FileFilter;
 
 public class DroneInterface extends Application {
-	int canvasWidth = 512;
-	int canvasHeight = 512;
-	boolean animationOn = false;
+	int canvasWidth = 854;
+	int canvasHeight = 480;
+//	int canvasWidth = 254;
+//	int canvasHeight = 180;
+	boolean animationOn = true;
+	GraphicsContext gc;
 	VBox rtPane;
 	UICanvas cnv;
 	DroneArena arena;
-	DroneBorderPane canvasBroders;
 //	Image drone = new Image(getClass().getResourceAsStream("./drone.png"));
 //	private Scanner s;						// scanner used for input from user
 //	private DroneArena myArena;				// arena in which drones are shown
@@ -340,7 +351,7 @@ public class DroneInterface extends Application {
 //		System.out.print(cnv.toString());		// printing 2D array in console
 //	}
 	
-	MenuBar setMenu() {
+	private MenuBar setMenu() {
 		MenuBar menuBar = new MenuBar();		// create menu
 
 		Menu mHelp = new Menu("Help");			// have entry for help
@@ -371,10 +382,11 @@ public class DroneInterface extends Application {
 		return menuBar;					// return the menu, so can be added
 	}
 	
-	private HBox setButtons() {
-		// create button
+	private HBox setControlButtons() {		
+		// animation on button
 		Button btnAnimOn = new Button("Start Animation");
-		// now add handler
+		btnAnimOn.getStyleClass().add("buttons");
+		// animation on handler
 		btnAnimOn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
@@ -382,53 +394,110 @@ public class DroneInterface extends Application {
 			}
 		});
 
+		// animation off button
 		Button btnAnimOff = new Button("Stop Animation");
-		// now add handler
+		btnAnimOff.getStyleClass().add("buttons");
+		// animation off handler
 		btnAnimOff.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
 				animationOn = false;
 			}
 		});
+		
+		// add drone button
+		Button btn = new Button("Add drone");
+		btn.getStyleClass().add("buttons");
+		// add drone handler
+		btn.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent event) {
+				if (animationOn) {
+					arena.addDrone();					
+				}
+//				System.out.println(arena.drn.size());
+//				System.out.println(arena.drn.get(0).getXSize());
+//				System.out.println(arena.drn.get(0).getYSize());
+			}
+		});
 
-		return new HBox(btnAnimOn, btnAnimOff);
+		HBox btnBox = new HBox(btnAnimOn, btnAnimOff, btn);
+		btnBox.getStyleClass().add("button-box");
+		
+		return btnBox;
 	}
 	
+	private VBox setDroneInfoList(ScrollPane scroll) {
 
+		// creating VBox pane
+		rtPane = new VBox();
+		rtPane.getStyleClass().add("drone-info-box");
+		rtPane.setAlignment(Pos.TOP_LEFT);
+		
+		for (int i = 0; i < arena.drn.size(); i++) {
+			Label l = new Label("drone: " + (i + 1) + " at x = " + (int)arena.drn.get(i).getX() + " y = " + (int)arena.drn.get(i).getY());
+			rtPane.getChildren().addAll(l);		
+		}
+		
+		// Adding VBox into the scroll pane
+		scroll.setContent(rtPane);
+		scroll.setMinViewportWidth(230);
+		scroll.setMinViewportHeight(canvasHeight - 15);
+		scroll.setMaxHeight(canvasHeight);
+		
+		return new VBox(listLabel(), scroll);
+	}
+
+	private VBox setCanvas(Group root) {
+		return new VBox(canvasLabel(), root);
+	}
+	
+	private Text canvasLabel() {
+		Text title = new Text("Drone arena");
+		
+		title.setFont(Font.font("arial", FontWeight.NORMAL, 27));
+		title.setFill(Color.rgb(50, 50, 50));
+		title.setTranslateX(canvasWidth / 2 - 50);
+		
+		return title;
+	}
+
+	private Text listLabel() {
+		Text title = new Text("Drone info");
+
+		title.setFont(Font.font("arial", FontWeight.NORMAL, 27));
+		title.setFill(Color.rgb(50, 50, 50));
+		title.setTranslateX(60);
+		
+		return title;
+	}
+	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
+		// primary stage properties
 		primaryStage.setTitle("Drone Simulator");
+//		primaryStage.setResizable(false);
 
-		BorderPane bp = new BorderPane();
-		
+		// initialising group, border/scroll panes, scene, canvas and arena
 		Group root = new Group();
+		BorderPane bp = new BorderPane();
+		ScrollPane scroll = new ScrollPane();
 		Canvas canvas = new Canvas(canvasWidth, canvasHeight);
-		cnv = new UICanvas(canvas.getGraphicsContext2D(), canvasWidth, canvasHeight);
-		root.getChildren().add(canvas);
-		arena = new DroneArena(canvasWidth, canvasHeight);
-
-		rtPane = new VBox();
-		String cssDroneList = "-fx-border-color: red;\n" +
-				                "-fx-margin: 50;\n" +
-				                "-fx-border-insets: 5;\n" +
-				                "-fx-border-width: 3;\n";
-		rtPane.setPrefSize(canvasWidth / 3, canvasHeight);
-		rtPane.setAlignment(Pos.TOP_LEFT);
-		rtPane.setStyle(cssDroneList);
-		rtPane.getChildren().addAll(new Label("drone1"));
-		
-		canvasBroders = new DroneBorderPane(arena);
 		Scene scene = new Scene(bp, canvasWidth * 1.3, canvasHeight * 1.3);
-		Button btn = canvasBroders.addDroneBtn();				
-
-		canvas.getGraphicsContext2D().setFill(Color.color(0.9, 0.9, 0.9, 1));
-		canvas.getGraphicsContext2D().fillRect(0, 0, canvasWidth, canvasHeight);
+		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		gc = canvas.getGraphicsContext2D();
+		cnv = new UICanvas(gc, canvasWidth, canvasHeight);
+		arena = new DroneArena(canvasWidth, canvasHeight);
 		
+		// Placing elements into right places in border pane
 		bp.setTop(setMenu());
-		bp.setLeft(root);
-		bp.setRight(rtPane);
-		bp.setBottom(new HBox(setButtons(), btn));
+		bp.setCenter(setCanvas(root));
+		bp.setRight(setDroneInfoList(scroll));
+		bp.setBottom(setControlButtons());
 		
+		// Adding canvas into the group
+		root.getChildren().add(canvas);
+
+		// Starting animation loop
 		final long startNanoTime = System.nanoTime();
 		new AnimationTimer() {
 
@@ -436,13 +505,16 @@ public class DroneInterface extends Application {
 			public void handle(long currentNanoTime) {
 				if (animationOn) {
 					double time = (currentNanoTime - startNanoTime) / 1000000000.0;
+					arena.drawObjects(cnv, gc);
 					arena.update();
-					arena.drawObjects(cnv, canvas);
+					
+					// Updating drone list
+					bp.setRight(setDroneInfoList(scroll));
 				}
 			}
 		}.start();
-		
-		
+
+		// rendering window
 		primaryStage.setScene(scene);
 		primaryStage.show();
 	}

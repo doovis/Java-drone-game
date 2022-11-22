@@ -5,6 +5,7 @@ import java.util.Random;
 
 import DroneSimulation.Direction.direction;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
@@ -47,10 +48,10 @@ public class DroneArena {	// Drone arena
 		moveAllDrones();		
 	}
 
-	public void drawObjects(UICanvas canvas, Canvas interfaceCanvas) {
+	public void drawObjects(UICanvas canvas, GraphicsContext gc) {
 		canvas.clearCanvas();
-		interfaceCanvas.getGraphicsContext2D().setFill(Color.color(0.9, 0.9, 0.9, 1));
-		interfaceCanvas.getGraphicsContext2D().fillRect(0, 0, xSize, ySize);
+		gc.setFill(Color.color(0.9, 0.9, 0.9, 1));
+		gc.fillRect(0, 0, xSize, ySize);
 		showDrones(canvas);
 	}
 
@@ -63,13 +64,13 @@ public class DroneArena {	// Drone arena
 		
 		do {
 			count++;
-			x = randomGenerator.nextInt(this.xSize - 50);
-			y = randomGenerator.nextInt(this.ySize - 50);
+			x = randomGenerator.nextInt(this.xSize - Drone.getXSize());
+			y = randomGenerator.nextInt(this.ySize - Drone.getYSize());
 			
 			// can delete drn.size check, but overflowing drone field will not be handled
 		} while (getDroneAt(x, y, Drone.getXSize(), Drone.getYSize(), 0) != null && count < drn.size());
 		
-		if (getDroneAt(x, y, Drone.getXSize(), Drone.getYSize(), 0) == null) {
+		if (getDroneAt(x, y, Drone.getXSize(), Drone.getYSize(), -1) == null) {
 			this.drn.add(new Drone(x, y, direction.randomDirection()));
 		}
 		
@@ -122,36 +123,41 @@ public class DroneArena {	// Drone arena
 	public boolean canMoveHere(Direction.direction dir, double x, double y, int droneXSize, int droneYSize, int id) {
 		boolean canMove = true;
 		
-		// Collision detection
-		switch (dir) {
-			case NORTH:
-				if (y < 1)		// If outside boundaries
-					return canMove = false;
-				if (getDroneAt(x, y - 1, droneXSize, droneYSize, id) != null)	// If drone is in the way
-					return canMove = false;
-				break;
-				
-			case EAST:
-				if (x + droneXSize >= xSize)	// If outside boundaries
-					return canMove = false;
-				if (getDroneAt(x + 1, y, droneXSize, droneYSize, id) != null)	// If drone is in the way
-					return canMove = false;	
-				break;
-				
-			case SOUTH:
-				if (y + droneYSize >= ySize)	// If outside boundaries
-					return canMove = false;
-				if (getDroneAt(x, y + 1, droneXSize, droneYSize, id) != null)	// If drone is in the way
-					return canMove = false;			
-				break;
-				
-			case WEST:
-				if (x < 1)	// If outside boundaries
-					return canMove = false;
-				if (getDroneAt(x - 1, y, droneXSize, droneYSize, id) != null)	// If drone is in the way
-					return canMove = false;	
-				break;
-		}
+//		if (y < 1 || x < 1 || y + droneYSize >= ySize || x + droneXSize >= xSize)		// If outside boundaries
+//			return canMove = false;
+//		if (getDroneAt(x, y, droneXSize, droneYSize, id) != null)	// If drone is in the way
+//			return canMove = false;
+		
+//		// Collision detection
+//		switch (dir) {
+//			case NORTH:
+//				if (y < 1)		// If outside boundaries
+//					return canMove = false;
+//				if (getDroneAt(x, y - 1, droneXSize, droneYSize, id) != null)	// If drone is in the way
+//					return canMove = false;
+//				break;
+//				
+//			case EAST:
+//				if (x + droneXSize >= xSize)	// If outside boundaries
+//					return canMove = false;
+//				if (getDroneAt(x + 1, y, droneXSize, droneYSize, id) != null)	// If drone is in the way
+//					return canMove = false;	
+//				break;
+//				
+//			case SOUTH:
+//				if (y + droneYSize >= ySize)	// If outside boundaries
+//					return canMove = false;
+//				if (getDroneAt(x, y + 1, droneXSize, droneYSize, id) != null)	// If drone is in the way
+//					return canMove = false;			
+//				break;
+//				
+//			case WEST:
+//				if (x < 1)	// If outside boundaries
+//					return canMove = false;
+//				if (getDroneAt(x - 1, y, droneXSize, droneYSize, id) != null)	// If drone is in the way
+//					return canMove = false;	
+//				break;
+//		}
 		
 		return canMove;
 	}

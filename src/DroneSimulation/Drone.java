@@ -1,9 +1,12 @@
 package DroneSimulation;
 
+import java.util.Random;
+
 import javafx.scene.image.Image;
+import javafx.scene.transform.Rotate;
 
 public class Drone {				// Drone class
-	private double x, dx, y, dy;	// Coordinates, delta x and y
+	private double x, dx, y, dy, angle;	// Coordinates, delta x and y
 	private int id;	// identifier
 	private static int drnxSize;
 	private static int drnySize;
@@ -24,6 +27,7 @@ public class Drone {				// Drone class
 		this.y = Y;
 		this.dx = 2;
 		this.dy = 2;
+		this.angle = new Random().nextInt(360);
 		this.id = count++;
 		this.dir = d;
 		this.drnxSize = 50;
@@ -89,14 +93,15 @@ public class Drone {				// Drone class
 	 */
 	public boolean isHere(double sx, double sy, int drnXSize, int drnYSize) {
 		// Checking each side of the drones
-		if (this.x < sx + drnXSize
-			&& this.x + drnxSize > sx
-			&& this.y < sy + drnYSize
-			&& this.y + drnySize > sy) {
-			return true;
-		}
+//		boolean collisionX = this.x < sx + drnXSize && this.x + drnxSize > sx;
+//		boolean collisionY = this.y < sy + drnYSize && this.y + drnySize > sy;
+
+//		if (this.x + 1 < sx + drnXSize && this.x + drnxSize - 1 > sx) {
+//			if ()
+//		}
 		
-		return false;			
+		
+		return collisionX && collisionY;
 	}
 	
 	/**
@@ -104,25 +109,47 @@ public class Drone {				// Drone class
 	 * @param arena
 	 */
 	public void tryToMove(DroneArena arena) {
-
-		if (arena.canMoveHere(dir, x, y, drnxSize, drnySize, id)) {	// if can move update x, y
-			switch (this.dir) {				// calculate next x, y position
-				case NORTH:
-						y -= dy;
-					break;
-				case EAST:
-						x += dx;
-					break;
-				case SOUTH:
-						y += dy;
-					break;
-				case WEST:
-						x -= dx;
-					break;
-			}
-		} else {
-			this.dir = dir.next(this.dir);	// Otherwise change direction
+		if (y < 1 || y + drnySize >= arena.ySize()) {
+			this.angle = -angle;
+		} else if (x < 1 || x + drnxSize >= arena.xSize()) {
+			this.angle = 180 - angle;
 		}
+
+//		if (arena.getDroneAt(x, y, drnxSize, drnySize, id) != null) {
+//			this.angle = -angle;			
+//		}
+		
+		this.x += dx * Math.cos((angle * (Math.PI / 180)));
+		this.y += dy * Math.sin((angle * (Math.PI / 180)));
+
+//		if (arena.getDroneAt(x, y, drnxSize, drnySize, id) != null) {
+//			this.angle = 180*Math.atan2(y-b.getY(), x-b.getX())/Math.PI;			
+//		}
+
+		if (arena.getDroneAt(x, y, drnxSize, drnySize, id) != null) {
+			this.angle = 180 - angle;			
+		}
+		
+//		if (arena.canMoveHere(dir, x, y, drnxSize, drnySize, id)) {	// if can move update x, y
+//			switch (this.dir) {				// calculate next x, y position
+//				case NORTH:
+//						y -= dy;
+//					break;
+//				case EAST:
+//						x += dx;
+//					break;
+//				case SOUTH:
+//						y += dy;
+//					break;
+//				case WEST:
+//						x -= dx;
+//					break;
+//			}
+//			System.out.println(angle);
+//		} else {
+
+//			this.dir = dir.next(this.dir);	// Otherwise change direction
+//		}
 	}
 	
 	/**
@@ -130,7 +157,7 @@ public class Drone {				// Drone class
 	 * @param c
 	 */
 	public void displayDrone(UICanvas c) {
-		c.drawImage(drone, this.x, this.y, drnxSize, drnySize);
+		c.drawImage(drone, this.angle, this.x, this.y, drnxSize, drnySize);
 	}
 	
 	/**
