@@ -54,10 +54,10 @@ import javax.swing.JScrollPane;
 import javax.swing.filechooser.FileFilter;
 
 public class DroneInterface extends Application {
-	int canvasWidth = 854;
-	int canvasHeight = 480;
-//	int canvasWidth = 254;
-//	int canvasHeight = 180;
+//	int canvasWidth = 854;
+//	int canvasHeight = 480;
+	int canvasWidth = 154;
+	int canvasHeight = 110;
 	boolean animationOn = true;
 	GraphicsContext gc;
 	VBox rtPane;
@@ -434,7 +434,7 @@ public class DroneInterface extends Application {
 		rtPane.setAlignment(Pos.TOP_LEFT);
 		
 		for (int i = 0; i < arena.drn.size(); i++) {
-			Label l = new Label("drone: " + (i + 1) + " at x = " + (int)arena.drn.get(i).getX() + " y = " + (int)arena.drn.get(i).getY());
+			Label l = new Label(arena.drn.get(i).toString());
 			rtPane.getChildren().addAll(l);		
 		}
 		

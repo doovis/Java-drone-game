@@ -8,9 +8,8 @@ import javafx.scene.transform.Rotate;
 public class Drone {				// Drone class
 	private double x, dx, y, dy, angle;	// Coordinates, delta x and y
 	private int id;	// identifier
-	private static int drnxSize;
-	private static int drnySize;
-	Direction.direction dir;		// Direction
+	private int drnxSize;
+	private int drnySize;
 	private static int count = 0;	// Id increment helper
 	Image drone;
 
@@ -22,14 +21,13 @@ public class Drone {				// Drone class
 	 * @param Y
 	 * @param d
 	 */
-	Drone(double X, double Y, Direction.direction d) {
+	Drone(double X, double Y) {
 		this.x = X;
 		this.y = Y;
 		this.dx = 2;
 		this.dy = 2;
-		this.angle = new Random().nextInt(360);
+		this.angle = /*new Random().nextInt(360)*/ 135;
 		this.id = count++;
-		this.dir = d;
 		this.drnxSize = 50;
 		this.drnySize = 50;
 		drone = new Image(getClass().getResourceAsStream("./drone.png"));
@@ -55,7 +53,7 @@ public class Drone {				// Drone class
 	 * get value of y
 	 * @return y
 	 */
-	public static int getXSize() {
+	public int getXSize() {
 		return drnxSize;
 	}
 
@@ -63,7 +61,7 @@ public class Drone {				// Drone class
 	 * get value of y
 	 * @return y
 	 */
-	public static int getYSize() {
+	public int getYSize() {
 		return drnySize;
 	}
 
@@ -92,16 +90,61 @@ public class Drone {				// Drone class
 	 * @return		true if drone is at sx,sy, false otherwise
 	 */
 	public boolean isHere(double sx, double sy, int drnXSize, int drnYSize) {
+		if (this.x + this.drnxSize > sx && this.x < sx + drnXSize
+			&& this.y + this.drnySize > sy && this.y < sy + drnYSize) {
+			return true;			
+		}
+		return false;			
+	}
+	
+	/**
+	 * AABB Collision check (Axis-aligned bounding boxes)
+	 * @param sx
+	 * @param sy
+	 * @param drnXSize
+	 * @param drnYSize
+	 * @return
+	 */
+	public int collisionCheck(double sx, double sy, int drnXSize, int drnYSize) {
 		// Checking each side of the drones
-//		boolean collisionX = this.x < sx + drnXSize && this.x + drnxSize > sx;
-//		boolean collisionY = this.y < sy + drnYSize && this.y + drnySize > sy;
 
-//		if (this.x + 1 < sx + drnXSize && this.x + drnxSize - 1 > sx) {
-//			if ()
-//		}
+		// Middle point of drone
+		double thisMiddlePositionX = this.x + (this.drnxSize / 2);
+		double thisMiddlePositionY = this.y + (this.drnySize / 2);
+
+		// Half size of drone
+		double thisHalfSizeX = (this.drnxSize / 2);
+		double thisHalfSizeY = (this.drnySize / 2);
 		
+		// Middle point of other drone
+		double otherMiddlePositionX = sx + (drnXSize / 2);
+		double otherMiddlePositionY = sy + (drnYSize / 2);
 		
-		return collisionX && collisionY;
+		// Half size of drone
+		double otherHalfSizeX = (drnXSize / 2);
+		double otherHalfSizeY = (drnYSize / 2);
+		
+		// Distance between drone middle points in x/y axis
+		double deltaX = otherMiddlePositionX - thisMiddlePositionX;
+		double deltaY = otherMiddlePositionY - thisMiddlePositionY;
+		
+		// Distance between drones edges in x/y axis
+		double intersectX = Math.abs(deltaX) - (otherHalfSizeX + thisHalfSizeX);
+		double intersectY = Math.abs(deltaY) - (otherHalfSizeY + thisHalfSizeY);
+
+		// If drones edges touch
+		if (intersectX < 0 && intersectY < 0) {
+//			System.out.println("intersection point: " + intersectX + " " + intersectY);
+			// if touched left and right sides
+			if (intersectX > intersectY) {
+				return 2; // 2 -> || sides collision
+			// if touched upper and bottom sides
+			} else {
+				return 1; // 1 -> = sides collision
+			}
+		}
+		
+		return 0; // If no collision detected
 	}
 	
 	/**
@@ -109,26 +152,23 @@ public class Drone {				// Drone class
 	 * @param arena
 	 */
 	public void tryToMove(DroneArena arena) {
+		// drone to drone collision detection
+		if (arena.checkDroneLocation(x, y, drnxSize, drnySize, id) == 1) {
+			this.angle = -angle;
+		} else if (arena.checkDroneLocation(x, y, drnxSize, drnySize, id) == 2) {
+			this.angle = 180 - angle;			
+
+		}
+		
+		// Arena border collision detection
 		if (y < 1 || y + drnySize >= arena.ySize()) {
 			this.angle = -angle;
 		} else if (x < 1 || x + drnxSize >= arena.xSize()) {
 			this.angle = 180 - angle;
 		}
-
-//		if (arena.getDroneAt(x, y, drnxSize, drnySize, id) != null) {
-//			this.angle = -angle;			
-//		}
 		
 		this.x += dx * Math.cos((angle * (Math.PI / 180)));
 		this.y += dy * Math.sin((angle * (Math.PI / 180)));
-
-//		if (arena.getDroneAt(x, y, drnxSize, drnySize, id) != null) {
-//			this.angle = 180*Math.atan2(y-b.getY(), x-b.getX())/Math.PI;			
-//		}
-
-		if (arena.getDroneAt(x, y, drnxSize, drnySize, id) != null) {
-			this.angle = 180 - angle;			
-		}
 		
 //		if (arena.canMoveHere(dir, x, y, drnxSize, drnySize, id)) {	// if can move update x, y
 //			switch (this.dir) {				// calculate next x, y position
@@ -164,7 +204,7 @@ public class Drone {				// Drone class
 	 * info about drone
 	 */
 	public String toString() {
-		return "Drone " + id + " is at " + x + ", " + y + ", and points to " + dir.toString();
+		return "Drone " + id + " is at " + (int)x + ", " + (int)y + ", and points to " + (int)(angle % 360);
 	}
 	
 	public static void main(String[] args) {
