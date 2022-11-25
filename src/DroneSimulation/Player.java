@@ -5,10 +5,10 @@ import java.util.Random;
 import javafx.scene.image.Image;
 
 public abstract class Player {
-	private double x, dx, y, dy;	// Coordinates, delta x and y
-	private int id, angle, health, drnxSize, drnySize;
-	private static int count = 0;	// Id increment helper
-	Image drone4, drone2;
+	protected double x, dx, y, dy;	// Coordinates, delta x and y
+	protected int id, angle, health, drnxSize, drnySize;
+	protected char type;
+	protected static int count = 0;	// Id increment helper
 
 	
 	/**
@@ -18,7 +18,7 @@ public abstract class Player {
 	 * @param Y
 	 * @param d
 	 */
-	Player(double X, double Y) {
+	Player(double X, double Y, char Type) {
 		this.x = X;
 		this.y = Y;
 		this.dx = 2.0;
@@ -26,13 +26,12 @@ public abstract class Player {
 		this.drnxSize = 40;
 		this.drnySize = 40;
 		this.health = 4;
+		this.type = Type;
 		this.angle = new Random().nextInt(360);
 		this.id = count++;
-		drone4 = new Image(getClass().getResourceAsStream("./img/drone4.png"));
-		drone2 = new Image(getClass().getResourceAsStream("./img/drone2.png"));
 	}
 
-	Player(double X, double Y, int Angle, int Health, int ID) {
+	Player(double X, double Y, int Angle, int Health, int ID, char Type) {
 		this.x = X;
 		this.y = Y;
 		this.dx = 2.0;
@@ -42,8 +41,7 @@ public abstract class Player {
 		this.health = Health;
 		this.angle = Angle;
 		this.id = ID;
-		drone4 = new Image(getClass().getResourceAsStream("./img/drone4.png"));
-		drone2 = new Image(getClass().getResourceAsStream("./img/drone2.png"));
+		this.type = Type;
 	}
 	
 	/**
@@ -60,6 +58,14 @@ public abstract class Player {
 	 */
 	public double getY() {
 		return y;
+	}
+
+	/**
+	 * get drone type
+	 * @return angle
+	 */
+	public char getType() {
+		return type;
 	}
 
 	/**
@@ -163,7 +169,6 @@ public abstract class Player {
 
 		// If drones edges touch
 		if (intersectX < 0 && intersectY < 0) {
-//				System.out.println("intersection point: " + intersectX + " " + intersectY);
 			// if touched left and right sides
 			if (intersectX > intersectY) {
 				sangle = 180 - sangle;
@@ -184,11 +189,18 @@ public abstract class Player {
 	 */
 	public void tryToMove(DroneArena arena) {
 		// drone to drone collision detection
-		if (arena.checkDroneLocation(x, y, angle, drnxSize, drnySize, id) == 1) {
+		if (arena.checkPlayerLocation(x, y, angle, drnxSize, drnySize, id, type) == 1) {
 			this.health = this.health - 1;
 			this.angle = -angle;
-		} else if (arena.checkDroneLocation(x, y, angle, drnxSize, drnySize, id) == 2) {
+		} else if (arena.checkPlayerLocation(x, y, angle, drnxSize, drnySize, id, type) == 2) {
 			this.health = this.health - 1;
+			this.angle = 180 - angle;
+		}
+		if (arena.checkPlayerLocation(x, y, angle, drnxSize, drnySize, id, type) == 3) {
+			this.health = this.health - 4;
+			this.angle = -angle;
+		} else if (arena.checkPlayerLocation(x, y, angle, drnxSize, drnySize, id, type) == 4) {
+			this.health = this.health - 4;
 			this.angle = 180 - angle;
 		}
 		
@@ -212,29 +224,16 @@ public abstract class Player {
 	}
 	
 	/**
-	 * displays drone as 'D' using ConsoleCanvas method 'showIt'
+	 * abstract method for player rendering using UICanvas
 	 * @param c
 	 */
-	public Player displayplayer(UICanvas c) {
-		if (this.health == 4) {
-			c.drawImage(drone4, this.x, this.y, drnxSize, drnySize);
-		} else if (this.health == 3) {
-			c.drawImage(drone4, this.x, this.y, drnxSize, drnySize);
-		} else if (this.health == 2) {
-			c.drawImage(drone2, this.x, this.y, drnxSize, drnySize);
-		} else if (this.health == 1) {
-			c.drawImage(drone2, this.x, this.y, drnxSize, drnySize);
-		} else if (this.health < 1) {
-			return this;
-		}
-		return null;
-	}
+	public abstract Player displayPlayer(UICanvas c);
 	
 	/**
 	 * info about player
 	 */
 	public String toString() {
-		return "Drone " + id + " is at " + (int)x + ", " + (int)y + ", angle " + (int)(angle % 360) + ", health " + health;
+		return "Player " + id + " is at " + (int)x + ", " + (int)y + ", angle " + (int)(angle % 360) + ", health " + health;
 	}
 		
 }

@@ -59,8 +59,8 @@ import javax.swing.JScrollPane;
 import javax.swing.filechooser.FileFilter;
 
 public class DroneInterface extends Application {
-	int canvasWidth = 854;
-	int canvasHeight = 480;
+	int canvasWidth = 1024;
+	int canvasHeight = 576;
 	boolean animationOn = true;
 	GraphicsContext gc;
 	VBox rtPane;
@@ -119,12 +119,13 @@ public class DroneInterface extends Application {
 				PrintWriter writer = new PrintWriter(outFileWriter);
 				
 				// Writing drone information in a line
-				for (int i = 0; i < arena.drn.size(); i++) {
-					writer.print(Math.floor(arena.drn.get(i).getX()) + " ");
-					writer.print(Math.floor(arena.drn.get(i).getY()) + " ");
-					writer.print(arena.drn.get(i).getAngle() + " ");
-					writer.print(arena.drn.get(i).getHealth() + " ");
-					writer.println(arena.drn.get(i).getID() + " ");
+				for (int i = 0; i < arena.players.size(); i++) {
+					writer.print(Math.floor(arena.players.get(i).getX()) + " ");
+					writer.print(Math.floor(arena.players.get(i).getY()) + " ");
+					writer.print(arena.players.get(i).getAngle() + " ");
+					writer.print(arena.players.get(i).getHealth() + " ");
+					writer.print(arena.players.get(i).getID() + " ");
+					writer.println(arena.players.get(i).getType() + " ");
 				}
 				
 				writer.close();
@@ -158,7 +159,7 @@ public class DroneInterface extends Application {
 				BufferedReader bufReader = new BufferedReader(fileReader);
 				StringBuilder sb = new StringBuilder();
 				String line = bufReader.readLine();
-				arena.drn = new ArrayList<Drone>();		// Initialising new drone array
+				arena.players = new ArrayList<Player>();		// Initialising new players array
 				
 				// Reading each line
 				while (line != null) {
@@ -178,14 +179,19 @@ public class DroneInterface extends Application {
 				
 				// Splitting each number in line into separate elements
 				for (int i = 0; i < str.size(); i++) {
-					String[] droneInfo = str.get(i).split(" ");
+					String[] playerInfo = str.get(i).split(" ");
 					
-					// Constructing new drone and adding to the list
-					Drone drone = new Drone(Double.parseDouble(droneInfo[0]), Double.parseDouble(droneInfo[1]), Integer.parseInt(droneInfo[2]), Integer.parseInt(droneInfo[3]), Integer.parseInt(droneInfo[4]));
-					arena.drn.add(drone);
+					// Constructing new arena object and adding to the list
+					if ((int)playerInfo[5].charAt(0) == 114) {
+						Drone player = new Drone(Double.parseDouble(playerInfo[0]), Double.parseDouble(playerInfo[1]), Integer.parseInt(playerInfo[2]), Integer.parseInt(playerInfo[3]), Integer.parseInt(playerInfo[4]));
+						arena.players.add(player);
+					} else if ((int)playerInfo[5].charAt(0) == 115) {
+						StrongDrone player = new StrongDrone(Double.parseDouble(playerInfo[0]), Double.parseDouble(playerInfo[1]), Integer.parseInt(playerInfo[2]), Integer.parseInt(playerInfo[3]), Integer.parseInt(playerInfo[4]));
+						arena.players.add(player);
+					}
 				}
-				
 				bufReader.close();
+
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -265,9 +271,13 @@ public class DroneInterface extends Application {
 		return menuBar;								// returning menu bar
 	}
 	
-	private HBox setControlButtons() {		
-		// animation on button
+	private HBox setControlButtons() {	
 		Image play = new Image(getClass().getResourceAsStream("./img/play.png"));
+		Image pause = new Image(getClass().getResourceAsStream("./img/pause.png"));
+		Image plus = new Image(getClass().getResourceAsStream("./img/plus.png"));
+		
+		
+		// animation on button
 		ImageView playImg = new ImageView(play);
 		playImg.setFitHeight(30);
 		playImg.setFitWidth(30);
@@ -282,7 +292,6 @@ public class DroneInterface extends Application {
 		});
 
 		// animation off button
-		Image pause = new Image(getClass().getResourceAsStream("./img/pause.png"));
 		ImageView pauseImg = new ImageView(pause);
 		pauseImg.setFitHeight(30);
 		pauseImg.setFitWidth(30);
@@ -297,22 +306,36 @@ public class DroneInterface extends Application {
 		});
 		
 		// add drone button
-		Image plus = new Image(getClass().getResourceAsStream("./img/plus.png"));
 		ImageView addImg = new ImageView(plus);
 		addImg.setFitHeight(30);
 		addImg.setFitWidth(30);
-		Button btn = new Button("Add drone", addImg);
-		btn.getStyleClass().add("buttons");
+		Button addplayersbtn = new Button("Add drone", addImg);
+		addplayersbtn.getStyleClass().add("buttons");
 		// add drone handler
-		btn.setOnAction(new EventHandler<ActionEvent>() {
+		addplayersbtn.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
 				if (animationOn) {
-					arena.addDrone();					
+					arena.addDrone('r');					
 				}
 			}
 		});
 
-		HBox btnBox = new HBox(btnAnimOn, btnAnimOff, btn);
+		// add Strong drone button
+		ImageView addImg2 = new ImageView(plus);
+		addImg2.setFitHeight(30);
+		addImg2.setFitWidth(30);
+		Button addStrplayersbtn = new Button("Add Strong drone", addImg2);
+		addStrplayersbtn.getStyleClass().add("buttons");
+		// add drone handler
+		addStrplayersbtn.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent event) {
+				if (animationOn) {
+					arena.addDrone('s');
+				}
+			}
+		});
+
+		HBox btnBox = new HBox(btnAnimOn, btnAnimOff, addplayersbtn, addStrplayersbtn);
 		btnBox.getStyleClass().add("button-box");
 		
 		return btnBox;
@@ -325,14 +348,14 @@ public class DroneInterface extends Application {
 		rtPane.getStyleClass().add("drone-info-box");
 		rtPane.setAlignment(Pos.TOP_LEFT);
 		
-		for (int i = 0; i < arena.drn.size(); i++) {
-			Label l = new Label(arena.drn.get(i).toString());
+		for (int i = 0; i < arena.players.size(); i++) {
+			Label l = new Label(arena.players.get(i).toString());
 			rtPane.getChildren().addAll(l);		
 		}
 		
 		// Adding VBox into the scroll pane
 		scroll.setContent(rtPane);
-		scroll.setMinViewportWidth(230);
+		scroll.setMinViewportWidth(250);
 		scroll.setMinViewportHeight(canvasHeight - 15);
 		scroll.setMaxHeight(canvasHeight);
 		

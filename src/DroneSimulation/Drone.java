@@ -1,17 +1,10 @@
 package DroneSimulation;
 
-import java.util.Random;
-
 import javafx.scene.image.Image;
-import javafx.scene.transform.Rotate;
 
-public class Drone {				// Drone class
-	private double x, dx, y, dy;	// Coordinates, delta x and y
-	private int id, angle, health, drnxSize, drnySize;
-	private static int count = 0;	// Id increment helper
-	Image drone4, drone2;
+public class Drone extends Player {				// Drone class
+	Image drone4, drone3, drone2, drone1;
 
-	
 	/**
 	 * Drone constructor initialising coordinates, deltas, 
 	 * id and direction
@@ -20,232 +13,42 @@ public class Drone {				// Drone class
 	 * @param d
 	 */
 	Drone(double X, double Y) {
-		this.x = X;
-		this.y = Y;
-		this.dx = 2.0;
-		this.dy = 2.0;
-		this.drnxSize = 40;
-		this.drnySize = 40;
-		this.health = 4;
-		this.angle = new Random().nextInt(360);
-		this.id = count++;
+		super(X, Y, 'r');
 		drone4 = new Image(getClass().getResourceAsStream("./img/drone4.png"));
+		drone3 = new Image(getClass().getResourceAsStream("./img/drone3.png"));
 		drone2 = new Image(getClass().getResourceAsStream("./img/drone2.png"));
-	}
-
-	Drone(double X, double Y, int Angle, int Health, int ID) {
-		this.x = X;
-		this.y = Y;
-		this.dx = 2.0;
-		this.dy = 2.0;
-		this.drnxSize = 40;
-		this.drnySize = 40;
-		this.health = Health;
-		this.angle = Angle;
-		this.id = ID;
-		drone4 = new Image(getClass().getResourceAsStream("./img/drone4.png"));
-		drone2 = new Image(getClass().getResourceAsStream("./img/drone2.png"));
+		drone1 = new Image(getClass().getResourceAsStream("./img/drone1.png"));
 	}
 	
 	/**
-	 * get value of x
-	 * @return x
-	 */
-	public double getX() {
-		return x;
-	}
-	
-	/**
-	 * get value of y
-	 * @return y
-	 */
-	public double getY() {
-		return y;
-	}
-
-	/**
-	 * get value of angle
-	 * @return angle
-	 */
-	public int getAngle() {
-		return angle;
-	}
-
-	/**
-	 * get value of health
-	 * @return health
-	 */
-	public int getHealth() {
-		return health;
-	}
-
-	/**
-	 * get value of drone x size
-	 * @return drnxSize
-	 */
-	public int getXSize() {
-		return drnxSize;
-	}
-
-	/**
-	 * get value of drone y size
-	 * @return drnySize
-	 */
-	public int getYSize() {
-		return drnySize;
-	}
-
-	/**
-	 * get value of id
-	 * @return id
-	 */
-	public int getID() {
-		return id;
-	}
-	
-	/**
-	 * set values of x and y
+	 * Overloaded Drone constructor for file saving method
 	 * @param X
 	 * @param Y
+	 * @param Angle
+	 * @param Health
+	 * @param ID
 	 */
-	public void setXY(double X, double Y) {
-		x = X;
-		y = Y;
+	Drone(double X, double Y, int Angle, int Health, int ID) {
+		super(X, Y, Angle, Health, ID, 'r');
+		drone4 = new Image(getClass().getResourceAsStream("./img/drone4.png"));
+		drone3 = new Image(getClass().getResourceAsStream("./img/drone3.png"));
+		drone2 = new Image(getClass().getResourceAsStream("./img/drone2.png"));
+		drone1 = new Image(getClass().getResourceAsStream("./img/drone1.png"));
 	}
 	
 	/**
-	 * Is the drone at this x,y position
-	 * @param sx	x position
-	 * @param sy	y position
-	 * @return		true if drone is at sx,sy, false otherwise
-	 */
-	public boolean isHere(double sx, double sy, int drnXSize, int drnYSize) {
-		if (this.x + this.drnxSize > sx && this.x < sx + drnXSize
-			&& this.y + this.drnySize > sy && this.y < sy + drnYSize) {
-			return true;			
-		}
-		return false;			
-	}
-	
-	/**
-	 * AABB Collision check (Axis-aligned bounding boxes)
-	 * @param sx
-	 * @param sy
-	 * @param drnXSize
-	 * @param drnYSize
-	 * @return
-	 */
-	public int collisionCheck(double sx, double sy, double sangle, int drnXSize, int drnYSize) {
-		// Checking each side of the drones
-
-		// Middle point of drone
-		double thisMiddlePositionX = this.x + (this.drnxSize / 2);
-		double thisMiddlePositionY = this.y + (this.drnySize / 2);
-
-		// Half size of drone
-		double thisHalfSizeX = (this.drnxSize / 2);
-		double thisHalfSizeY = (this.drnySize / 2);
-		
-		// Middle point of other drone
-		double otherMiddlePositionX = sx + (drnXSize / 2);
-		double otherMiddlePositionY = sy + (drnYSize / 2);
-		
-		// Half size of other drone
-		double otherHalfSizeX = (drnXSize / 2);
-		double otherHalfSizeY = (drnYSize / 2);
-		
-		// Distance between drone middle points in x/y axis
-		double deltaX = otherMiddlePositionX - thisMiddlePositionX;
-		double deltaY = otherMiddlePositionY - thisMiddlePositionY;
-		
-		// Distance between drones edges in x/y axis
-		double intersectX = Math.abs(deltaX) - (otherHalfSizeX + thisHalfSizeX);
-		double intersectY = Math.abs(deltaY) - (otherHalfSizeY + thisHalfSizeY);
-
-		// If drones edges touch
-		if (intersectX < 0 && intersectY < 0) {
-//			System.out.println("intersection point: " + intersectX + " " + intersectY);
-			// if touched left and right sides
-			if (intersectX > intersectY) {
-				sangle = 180 - sangle;
-				return 2; // 2 -> || sides collision
-			// if touched upper and bottom sides
-			} else {
-				sangle = -sangle;
-				return 1; // 1 -> = sides collision
-			}
-		}
-		
-		return 0; // If no collision detected
-	}
-	
-	/**
-	 * attempting to move drone if the area to move to is not obstructed
-	 * @param arena
-	 */
-	public void tryToMove(DroneArena arena) {
-		// drone to drone collision detection
-		if (arena.checkDroneLocation(x, y, angle, drnxSize, drnySize, id) == 1) {
-			this.health = this.health - 1;
-			this.angle = -angle;
-		} else if (arena.checkDroneLocation(x, y, angle, drnxSize, drnySize, id) == 2) {
-			this.health = this.health - 1;
-			this.angle = 180 - angle;
-		}
-		
-		// Arena border collision detection
-		if (y < 1) {
-			this.y = 1;
-			this.angle = -angle;
-		} else if (y + drnySize >= arena.ySize()) {
-			this.y = arena.ySize() - drnySize - 1;
-			this.angle = -angle;
-		} else if (x < 1) {
-			this.x = 1;
-			this.angle = 180 - angle;
-		} else if (x + drnxSize >= arena.xSize()) {
-			this.x = arena.xSize() - drnxSize - 1;
-			this.angle = 180 - angle;
-		}
-		
-		this.x += dx * Math.cos((angle * (Math.PI / 180)));
-		this.y += dy * Math.sin((angle * (Math.PI / 180)));
-		
-//		if (arena.canMoveHere(dir, x, y, drnxSize, drnySize, id)) {	// if can move update x, y
-//			switch (this.dir) {				// calculate next x, y position
-//				case NORTH:
-//						y -= dy;
-//					break;
-//				case EAST:
-//						x += dx;
-//					break;
-//				case SOUTH:
-//						y += dy;
-//					break;
-//				case WEST:
-//						x -= dx;
-//					break;
-//			}
-//			System.out.println(angle);
-//		} else {
-
-//			this.dir = dir.next(this.dir);	// Otherwise change direction
-//		}
-	}
-	
-	/**
-	 * displays drone as 'D' using ConsoleCanvas method 'showIt'
+	 * abstract method from player rendering drones using UICanvas
 	 * @param c
 	 */
-	public Drone displayDrone(UICanvas c) {
+	public Drone displayPlayer(UICanvas c) {
 		if (this.health == 4) {
 			c.drawImage(drone4, this.x, this.y, drnxSize, drnySize);
 		} else if (this.health == 3) {
-			c.drawImage(drone4, this.x, this.y, drnxSize, drnySize);
+			c.drawImage(drone3, this.x, this.y, drnxSize, drnySize);
 		} else if (this.health == 2) {
 			c.drawImage(drone2, this.x, this.y, drnxSize, drnySize);
 		} else if (this.health == 1) {
-			c.drawImage(drone2, this.x, this.y, drnxSize, drnySize);
+			c.drawImage(drone1, this.x, this.y, drnxSize, drnySize);
 		} else if (this.health < 1) {
 			return this;
 		}
@@ -257,16 +60,5 @@ public class Drone {				// Drone class
 	 */
 	public String toString() {
 		return "Drone " + id + " is at " + (int)x + ", " + (int)y + ", angle " + (int)(angle % 360) + ", health " + health;
-	}
-	
-	public static void main(String[] args) {
-//		Drone d = new Drone(1, 1, Direction.direction.NORTH);	// Drone instance
-//		DroneArena a = new DroneArena(2, 2);
-//		a.addDrone();
-//		System.out.println(d.toString());	// Print where it is		
-//		d.tryToMove(a);
-//		d.tryToMove(a);
-//		d.tryToMove(a);
-//		System.out.println(d.toString());	// Print where it is		
 	}
 }

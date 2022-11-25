@@ -11,7 +11,7 @@ import javafx.scene.paint.Color;
 
 public class DroneArena {	// Drone arena
 	private int xSize, ySize;		// Arena size
-	ArrayList<Drone> drn;	// Drones array
+	ArrayList<Player> players;	// Drones array
 	Random randomGenerator;	// Random object
 	Image bg;
 	
@@ -26,7 +26,7 @@ public class DroneArena {	// Drone arena
 		this.ySize = h;
 		this.bg = new Image(getClass().getResourceAsStream("./img/apocalypticBG.jpg"));
 		randomGenerator = new Random();
-		drn = new ArrayList<Drone>();
+		players = new ArrayList<Player>();
 	}
 	
 	/**
@@ -45,68 +45,64 @@ public class DroneArena {	// Drone arena
 		return ySize;
 	}
 	
-	public void setDroneArray(ArrayList<Drone> droneArray) {
-		drn = droneArray;
-	}
-	
+	/**
+	 * method for updating drone x/y positions in the simulation loop
+	 */
 	public void update() {
-		moveAllDrones();		
+		moveAllPlayers();		
 	}
 
+	/**
+	 * redrawing objects in arena
+	 * @param canvas
+	 * @param gc
+	 */
 	public void drawObjects(UICanvas canvas, GraphicsContext gc) {
-		// Refresh canvas
 		canvas.clearCanvas();
-//		canvas.drawImage(bg, 0, 0, xSize, ySize);
-		gc.setFill(Color.color(0.9, 0.9, 0.9, 1));
-		gc.fillRect(0, 0, xSize, ySize);
-		drawDrones(canvas);
+		canvas.drawImage(bg, 0, 0, xSize, ySize);
+//		gc.setFill(Color.color(0.9, 0.9, 0.9, 1));
+//		gc.fillRect(0, 0, xSize, ySize);
+		drawPlayers(canvas);
 	}
 
 	/**
 	 * add drone to the list with random coordinates
 	 */
-	public void addDrone() {
-		int count = -1000;	// Does up to 10 extra random place searches for each drone after which cancels the search
+	public void addDrone(char type) {
 		int x, y;
 		
 		do {
-			count++;
-//			System.out.println(Drone.getXSize());
 			x = randomGenerator.nextInt(this.xSize - 52) + 1;
 			y = randomGenerator.nextInt(this.ySize - 52) + 1;
-			
-			// can delete drn.size check, but overflowing drone field will not be handled
-		} while (getDroneAt(x, y, 50, 50) != null && count < drn.size());
+		} while (getDroneAt(x, y, 50, 50) != null);
 		
 		if (getDroneAt(x, y, 50, 50) == null) {
-			this.drn.add(new Drone(x, y));
+			if (type == 'r') this.players.add(new Drone(x, y));
+			if (type == 's') this.players.add(new StrongDrone(x, y));
 		}
-		
 	}
 	
 	/**
 	 * display drones present in the list
 	 * @param c
 	 */
-	public void drawDrones(UICanvas c) {
-		Drone droneToRemove = null;
-		for (Drone d : drn) {
-			Drone drone = d.displayDrone(c);
-			if (drone != null) droneToRemove = drone;
+	public void drawPlayers(UICanvas c) {
+		Player playerToRemove = null;
+		for (Player p : players) {
+			Player player = p.displayPlayer(c);
+			if (player != null) playerToRemove = player;
 		}
-		if (droneToRemove != null) {
-			drn.remove(droneToRemove);
+		if (playerToRemove != null) {
+			players.remove(playerToRemove);
 		}
-//		if (drone != null) {
-//		}
 	}
 	
 	/**
 	 * moving all drones
 	 */
-	public void moveAllDrones() {
-		for (Drone d : drn) {
-			d.tryToMove(this);
+	public void moveAllPlayers() {
+		for (Player p : players) {
+			p.tryToMove(this);
 		}
 	}
 	
@@ -116,81 +112,44 @@ public class DroneArena {	// Drone arena
 	 * @param y
 	 * @return null if no Drone there, otherwise return drone
 	 */
-	public Drone getDroneAt(double x, double y, int drnXSize, int drnYSize) {
-		Drone drone = null;
+	public Player getDroneAt(double x, double y, int playersXSize, int playersYSize) {
+		Player drone = null;
 		
-		for(Drone d : drn) {
+		for(Player p : players) {
 			// If drone is at the location - return it
-			if (d.isHere(x, y, drnXSize, drnYSize)) {
-				return d;
+			if (p.isHere(x, y, playersXSize, playersYSize)) {
+				return p;
 			}
 		}
 		return drone;
 	}
 	
-	public int checkDroneLocation(double x, double y, double angle, int drnXSize, int drnYSize, int id) {
+	public int checkPlayerLocation(double x, double y, double angle, int playersXSize, int playersYSize, int id, char type) {
 //		Drone drone = null;
 		
-		for(Drone d : drn) {
+		for(Player p : players) {
 			// If vertical collision - return 1
-			if (d.collisionCheck(x, y, angle, drnXSize, drnYSize) == 1 && d.getID() != id) {
-				return 1;
-
+			if (p.collisionCheck(x, y, angle, playersXSize, playersYSize) == 1 && p.getID() != id) {
+				if (p.type == 's' && type == 's') {
+					return 1;					
+				} else if (p.type == 's') {
+					return 3;
+				} else {
+					return 1;					
+				}
+			}
 			// If horizontal collision - return 2
-			} else if (d.collisionCheck(x, y, angle, drnXSize, drnYSize) == 2 && d.getID() != id) {
-				return 2;
+			else if (p.collisionCheck(x, y, angle, playersXSize, playersYSize) == 2 && p.getID() != id) {
+				if (p.type == 's' && type == 's') {
+					return 2;					
+				} else if (p.type == 's') {
+					return 4;
+				} else {
+					return 2;										
+				}
 			}
 		}
 		return 0;
-	}
-	
-	/**
-	 * checking if the direction drone is moving towards is not obstructed
-	 * @param dir
-	 * @param x
-	 * @param y
-	 * @return
-	 */
-	public boolean canMoveHere(Direction.direction dir, double x, double y, int droneXSize, int droneYSize, int id) {
-		boolean canMove = true;
-		
-//		if (y < 1 || x < 1 || y + droneYSize >= ySize || x + droneXSize >= xSize)		// If outside boundaries
-//			return canMove = false;
-//		if (getDroneAt(x, y, droneXSize, droneYSize, id) != null)	// If drone is in the way
-//			return canMove = false;
-		
-//		// Collision detection
-//		switch (dir) {
-//			case NORTH:
-//				if (y < 1)		// If outside boundaries
-//					return canMove = false;
-//				if (getDroneAt(x, y - 1, droneXSize, droneYSize, id) != null)	// If drone is in the way
-//					return canMove = false;
-//				break;
-//				
-//			case EAST:
-//				if (x + droneXSize >= xSize)	// If outside boundaries
-//					return canMove = false;
-//				if (getDroneAt(x + 1, y, droneXSize, droneYSize, id) != null)	// If drone is in the way
-//					return canMove = false;	
-//				break;
-//				
-//			case SOUTH:
-//				if (y + droneYSize >= ySize)	// If outside boundaries
-//					return canMove = false;
-//				if (getDroneAt(x, y + 1, droneXSize, droneYSize, id) != null)	// If drone is in the way
-//					return canMove = false;			
-//				break;
-//				
-//			case WEST:
-//				if (x < 1)	// If outside boundaries
-//					return canMove = false;
-//				if (getDroneAt(x - 1, y, droneXSize, droneYSize, id) != null)	// If drone is in the way
-//					return canMove = false;	
-//				break;
-//		}
-		
-		return canMove;
 	}
 	
 	/**
@@ -199,21 +158,9 @@ public class DroneArena {	// Drone arena
 	public String toString() {
 		String str = "Arena size: x = " + xSize + " y = " + ySize + "\n\n";
 
-		for (Drone i : drn) {
+		for (Player i : players) {
 			str += i.toString()  + "\n";
 		}
 		return str;
-	}
-	
-	public static void main(String[] args) {
-		DroneArena a = new DroneArena(2, 2);
-//		a.addDrone();			
-//		a.addDrone();			
-//		a.addDrone();			
-//		a.canMoveHere(null, xSize, xSize);
-//		for (int i = 0; i < 4; i++) {
-//			a.addDrone();			
-//		}
-		System.out.println(a.toString());	//Printing arena/drones info in text format		
 	}
 }
