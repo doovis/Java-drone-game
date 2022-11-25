@@ -12,8 +12,8 @@ import javafx.scene.paint.Color;
 public class DroneArena {	// Drone arena
 	private int xSize, ySize;		// Arena size
 	ArrayList<Drone> drn;	// Drones array
-	Drone droneInstance;	// Drones array
 	Random randomGenerator;	// Random object
+	Image bg;
 	
 	/**
 	 * drone arena constructor initialising arena's size, 
@@ -24,6 +24,7 @@ public class DroneArena {	// Drone arena
 	DroneArena(int w, int h) {
 		this.xSize = w;
 		this.ySize = h;
+		this.bg = new Image(getClass().getResourceAsStream("./img/apocalypticBG.jpg"));
 		randomGenerator = new Random();
 		drn = new ArrayList<Drone>();
 	}
@@ -44,15 +45,21 @@ public class DroneArena {	// Drone arena
 		return ySize;
 	}
 	
+	public void setDroneArray(ArrayList<Drone> droneArray) {
+		drn = droneArray;
+	}
+	
 	public void update() {
 		moveAllDrones();		
 	}
 
 	public void drawObjects(UICanvas canvas, GraphicsContext gc) {
+		// Refresh canvas
 		canvas.clearCanvas();
+//		canvas.drawImage(bg, 0, 0, xSize, ySize);
 		gc.setFill(Color.color(0.9, 0.9, 0.9, 1));
 		gc.fillRect(0, 0, xSize, ySize);
-		showDrones(canvas);
+		drawDrones(canvas);
 	}
 
 	/**
@@ -65,8 +72,8 @@ public class DroneArena {	// Drone arena
 		do {
 			count++;
 //			System.out.println(Drone.getXSize());
-			x = /*randomGenerator.nextInt(this.xSize - 52) + 1*/ 60;
-			y = /*randomGenerator.nextInt(this.ySize - 52) + 1*/ 60;
+			x = randomGenerator.nextInt(this.xSize - 52) + 1;
+			y = randomGenerator.nextInt(this.ySize - 52) + 1;
 			
 			// can delete drn.size check, but overflowing drone field will not be handled
 		} while (getDroneAt(x, y, 50, 50) != null && count < drn.size());
@@ -81,10 +88,17 @@ public class DroneArena {	// Drone arena
 	 * display drones present in the list
 	 * @param c
 	 */
-	public void showDrones(UICanvas c) {
+	public void drawDrones(UICanvas c) {
+		Drone droneToRemove = null;
 		for (Drone d : drn) {
-			d.displayDrone(c);
+			Drone drone = d.displayDrone(c);
+			if (drone != null) droneToRemove = drone;
 		}
+		if (droneToRemove != null) {
+			drn.remove(droneToRemove);
+		}
+//		if (drone != null) {
+//		}
 	}
 	
 	/**
@@ -114,14 +128,16 @@ public class DroneArena {	// Drone arena
 		return drone;
 	}
 	
-	public int checkDroneLocation(double x, double y, int drnXSize, int drnYSize, int id) {
+	public int checkDroneLocation(double x, double y, double angle, int drnXSize, int drnYSize, int id) {
 //		Drone drone = null;
 		
 		for(Drone d : drn) {
-			// If drone is at the location - return it
-			if (d.collisionCheck(x, y, drnXSize, drnYSize) == 1 && d.getID() != id) {
+			// If vertical collision - return 1
+			if (d.collisionCheck(x, y, angle, drnXSize, drnYSize) == 1 && d.getID() != id) {
 				return 1;
-			} else if (d.collisionCheck(x, y, drnXSize, drnYSize) == 2 && d.getID() != id) {
+
+			// If horizontal collision - return 2
+			} else if (d.collisionCheck(x, y, angle, drnXSize, drnYSize) == 2 && d.getID() != id) {
 				return 2;
 			}
 		}

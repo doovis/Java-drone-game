@@ -38,12 +38,8 @@ public class UICanvas extends Application {
 	 * @param width
 	 * @param height
 	 */
-	public void drawImage(Image img, double angle, double x, double y, double width, double height) {
-//		gc.save();
-//		Rotate r = new Rotate(22, x, y);
-//		gc.setTransform(r.getMxx(), r.getMyx(), r.getMxy(), r.getMyy(), r.getTx(), r.getTy());
+	public void drawImage(Image img, double x, double y, double width, double height) {
 		gc.drawImage(img, x, y, width, height);
-//		gc.restore();
 	}
 
 	/**

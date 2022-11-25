@@ -3,9 +3,8 @@ package DroneSimulation;
 import java.util.Random;
 
 import javafx.scene.image.Image;
-import javafx.scene.transform.Rotate;
 
-public class Drone {				// Drone class
+public abstract class Player {
 	private double x, dx, y, dy;	// Coordinates, delta x and y
 	private int id, angle, health, drnxSize, drnySize;
 	private static int count = 0;	// Id increment helper
@@ -19,7 +18,7 @@ public class Drone {				// Drone class
 	 * @param Y
 	 * @param d
 	 */
-	Drone(double X, double Y) {
+	Player(double X, double Y) {
 		this.x = X;
 		this.y = Y;
 		this.dx = 2.0;
@@ -33,7 +32,7 @@ public class Drone {				// Drone class
 		drone2 = new Image(getClass().getResourceAsStream("./img/drone2.png"));
 	}
 
-	Drone(double X, double Y, int Angle, int Health, int ID) {
+	Player(double X, double Y, int Angle, int Health, int ID) {
 		this.x = X;
 		this.y = Y;
 		this.dx = 2.0;
@@ -164,7 +163,7 @@ public class Drone {				// Drone class
 
 		// If drones edges touch
 		if (intersectX < 0 && intersectY < 0) {
-//			System.out.println("intersection point: " + intersectX + " " + intersectY);
+//				System.out.println("intersection point: " + intersectX + " " + intersectY);
 			// if touched left and right sides
 			if (intersectX > intersectY) {
 				sangle = 180 - sangle;
@@ -210,34 +209,13 @@ public class Drone {				// Drone class
 		
 		this.x += dx * Math.cos((angle * (Math.PI / 180)));
 		this.y += dy * Math.sin((angle * (Math.PI / 180)));
-		
-//		if (arena.canMoveHere(dir, x, y, drnxSize, drnySize, id)) {	// if can move update x, y
-//			switch (this.dir) {				// calculate next x, y position
-//				case NORTH:
-//						y -= dy;
-//					break;
-//				case EAST:
-//						x += dx;
-//					break;
-//				case SOUTH:
-//						y += dy;
-//					break;
-//				case WEST:
-//						x -= dx;
-//					break;
-//			}
-//			System.out.println(angle);
-//		} else {
-
-//			this.dir = dir.next(this.dir);	// Otherwise change direction
-//		}
 	}
 	
 	/**
 	 * displays drone as 'D' using ConsoleCanvas method 'showIt'
 	 * @param c
 	 */
-	public Drone displayDrone(UICanvas c) {
+	public Player displayplayer(UICanvas c) {
 		if (this.health == 4) {
 			c.drawImage(drone4, this.x, this.y, drnxSize, drnySize);
 		} else if (this.health == 3) {
@@ -253,20 +231,10 @@ public class Drone {				// Drone class
 	}
 	
 	/**
-	 * info about drone
+	 * info about player
 	 */
 	public String toString() {
 		return "Drone " + id + " is at " + (int)x + ", " + (int)y + ", angle " + (int)(angle % 360) + ", health " + health;
 	}
-	
-	public static void main(String[] args) {
-//		Drone d = new Drone(1, 1, Direction.direction.NORTH);	// Drone instance
-//		DroneArena a = new DroneArena(2, 2);
-//		a.addDrone();
-//		System.out.println(d.toString());	// Print where it is		
-//		d.tryToMove(a);
-//		d.tryToMove(a);
-//		d.tryToMove(a);
-//		System.out.println(d.toString());	// Print where it is		
-	}
+		
 }
