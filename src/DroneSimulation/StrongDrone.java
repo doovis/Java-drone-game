@@ -2,7 +2,7 @@ package DroneSimulation;
 
 import javafx.scene.image.Image;
 
-public class StrongDrone extends Player {
+public class StrongDrone extends Entity {
 	Image drone4, drone3, drone2, drone1;
 
 	
@@ -44,13 +44,13 @@ public class StrongDrone extends Player {
 	 */
 	public StrongDrone displayPlayer(UICanvas c) {
 		if (this.health == 4) {
-			c.drawImage(drone4, this.x, this.y, drnxSize, drnySize);
+			c.drawImage(drone4, this.x, this.y, entxSize, entySize);
 		} else if (this.health == 3) {
-			c.drawImage(drone3, this.x, this.y, drnxSize, drnySize);
+			c.drawImage(drone3, this.x, this.y, entxSize, entySize);
 		} else if (this.health == 2) {
-			c.drawImage(drone2, this.x, this.y, drnxSize, drnySize);
+			c.drawImage(drone2, this.x, this.y, entxSize, entySize);
 		} else if (this.health == 1) {
-			c.drawImage(drone1, this.x, this.y, drnxSize, drnySize);
+			c.drawImage(drone1, this.x, this.y, entxSize, entySize);
 		} else if (this.health < 1) {
 			return this;
 		}

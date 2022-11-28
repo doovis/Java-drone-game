@@ -1,6 +1,8 @@
 package DroneSimulation;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
@@ -32,6 +34,17 @@ public class UICanvas {
 	 */
 	public void drawImage(Image img, double x, double y, double width, double height) {
 		gc.drawImage(img, x, y, width, height);
+	}
+	
+	/**
+	 * Dialog box
+	 */
+	public void dialogBox(String title, String message) {
+		Alert alert = new Alert(AlertType.INFORMATION);				// Instantiating dialog box
+		alert.setTitle(title);
+		alert.setHeaderText(null);
+		alert.setContentText(message);
+		alert.showAndWait();	
 	}
 
 	/**

@@ -2,11 +2,9 @@ package DroneSimulation;
 
 import java.util.Random;
 
-import javafx.scene.image.Image;
-
-public abstract class Player {
+public abstract class Entity {
 	protected double x, dx, y, dy;	// Coordinates, delta x and y
-	protected int id, angle, health, drnxSize, drnySize;
+	protected int id, angle, health, entxSize, entySize;
 	protected char type;
 	protected static int count = 0;	// Id increment helper
 
@@ -18,26 +16,26 @@ public abstract class Player {
 	 * @param Y
 	 * @param d
 	 */
-	Player(double X, double Y, char Type) {
+	Entity(double X, double Y, char Type) {
 		this.x = X;
 		this.y = Y;
 		this.dx = 2.0;
 		this.dy = 2.0;
-		this.drnxSize = 40;
-		this.drnySize = 40;
+		this.entxSize = 40;
+		this.entySize = 40;
 		this.health = 4;
 		this.type = Type;
 		this.angle = new Random().nextInt(360);
 		this.id = count++;
 	}
 
-	Player(double X, double Y, int Angle, int Health, int ID, char Type) {
+	Entity(double X, double Y, int Angle, int Health, int ID, char Type) {
 		this.x = X;
 		this.y = Y;
 		this.dx = 2.0;
 		this.dy = 2.0;
-		this.drnxSize = 40;
-		this.drnySize = 40;
+		this.entxSize = 40;
+		this.entySize = 40;
 		this.health = Health;
 		this.angle = Angle;
 		this.id = ID;
@@ -89,7 +87,7 @@ public abstract class Player {
 	 * @return drnxSize
 	 */
 	public int getXSize() {
-		return drnxSize;
+		return entxSize;
 	}
 
 	/**
@@ -97,7 +95,7 @@ public abstract class Player {
 	 * @return drnySize
 	 */
 	public int getYSize() {
-		return drnySize;
+		return entySize;
 	}
 
 	/**
@@ -125,8 +123,8 @@ public abstract class Player {
 	 * @return		true if drone is at sx,sy, false otherwise
 	 */
 	public boolean isHere(double sx, double sy, int drnXSize, int drnYSize) {
-		if (this.x + this.drnxSize > sx && this.x < sx + drnXSize
-			&& this.y + this.drnySize > sy && this.y < sy + drnYSize) {
+		if (this.x + this.entxSize > sx && this.x < sx + drnXSize
+			&& this.y + this.entySize > sy && this.y < sy + drnYSize) {
 			return true;			
 		}
 		return false;			
@@ -144,12 +142,12 @@ public abstract class Player {
 		// Checking each side of the drones
 
 		// Middle point of drone
-		double thisMiddlePositionX = this.x + (this.drnxSize / 2);
-		double thisMiddlePositionY = this.y + (this.drnySize / 2);
+		double thisMiddlePositionX = this.x + (this.entxSize / 2);
+		double thisMiddlePositionY = this.y + (this.entySize / 2);
 
 		// Half size of drone
-		double thisHalfSizeX = (this.drnxSize / 2);
-		double thisHalfSizeY = (this.drnySize / 2);
+		double thisHalfSizeX = (this.entxSize / 2);
+		double thisHalfSizeY = (this.entySize / 2);
 		
 		// Middle point of other drone
 		double otherMiddlePositionX = sx + (drnXSize / 2);
@@ -190,27 +188,27 @@ public abstract class Player {
 	public void tryToMove(DroneArena arena) {
 		// object to object collision detection
 		// regular to regular / strong to strong drones
-		if (arena.checkPlayerLocation(x, y, angle, drnxSize, drnySize, id, type) == 1) {
+		if (arena.checkPlayerLocation(x, y, angle, entxSize, entySize, id, type) == 1) {
 			this.health = this.health - 1;
 			this.angle = -angle;
-		} else if (arena.checkPlayerLocation(x, y, angle, drnxSize, drnySize, id, type) == 2) {
+		} else if (arena.checkPlayerLocation(x, y, angle, entxSize, entySize, id, type) == 2) {
 			this.health = this.health - 1;
 			this.angle = 180 - angle;
 		}
 
 		//  strong to regular drones
-		if (arena.checkPlayerLocation(x, y, angle, drnxSize, drnySize, id, type) == 3) {
+		if (arena.checkPlayerLocation(x, y, angle, entxSize, entySize, id, type) == 3) {
 			this.health = this.health - 4;
 			this.angle = -angle;
-		} else if (arena.checkPlayerLocation(x, y, angle, drnxSize, drnySize, id, type) == 4) {
+		} else if (arena.checkPlayerLocation(x, y, angle, entxSize, entySize, id, type) == 4) {
 			this.health = this.health - 4;
 			this.angle = 180 - angle;
 		}
 		
 		// drones to obstacles
-		if (arena.checkPlayerLocation(x, y, angle, drnxSize, drnySize, id, type) == 5) {
+		if (arena.checkPlayerLocation(x, y, angle, entxSize, entySize, id, type) == 5) {
 			this.angle = -angle;
-		} else if (arena.checkPlayerLocation(x, y, angle, drnxSize, drnySize, id, type) == 6) {
+		} else if (arena.checkPlayerLocation(x, y, angle, entxSize, entySize, id, type) == 6) {
 			this.angle = 180 - angle;
 		}
 		
@@ -218,14 +216,14 @@ public abstract class Player {
 		if (y < 1) {
 			this.y = 1;
 			this.angle = -angle;
-		} else if (y + drnySize >= arena.ySize()) {
-			this.y = arena.ySize() - drnySize - 1;
+		} else if (y + entySize >= arena.ySize()) {
+			this.y = arena.ySize() - entySize - 1;
 			this.angle = -angle;
 		} else if (x < 1) {
 			this.x = 1;
 			this.angle = 180 - angle;
-		} else if (x + drnxSize >= arena.xSize()) {
-			this.x = arena.xSize() - drnxSize - 1;
+		} else if (x + entxSize >= arena.xSize()) {
+			this.x = arena.xSize() - entxSize - 1;
 			this.angle = 180 - angle;
 		}
 		
@@ -237,7 +235,7 @@ public abstract class Player {
 	 * abstract method for player rendering using UICanvas
 	 * @param c
 	 */
-	public abstract Player displayPlayer(UICanvas c);
+	public abstract Entity displayPlayer(UICanvas c);
 	
 	/**
 	 * info about player

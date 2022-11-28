@@ -3,16 +3,12 @@ package DroneSimulation;
 import java.util.ArrayList;
 import java.util.Random;
 
-import DroneSimulation.Direction.direction;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-import javafx.scene.paint.Color;
 
 public class DroneArena {	// Drone arena
 	private int xSize, ySize;		// Arena size
-	ArrayList<Player> players;	// Drones array
-	ArrayList<Obstacle> obstacles;	// obstacles array
+	ArrayList<Entity> entities;	// Drones array
 	Random randomGenerator;	// Random object
 	Image bg;
 	
@@ -27,8 +23,7 @@ public class DroneArena {	// Drone arena
 		this.ySize = h;
 		this.bg = new Image(getClass().getResourceAsStream("./img/background.png"));
 		randomGenerator = new Random();
-		players = new ArrayList<Player>();
-		obstacles = new ArrayList<Obstacle>();
+		entities = new ArrayList<Entity>();
 	}
 	
 	/**
@@ -51,7 +46,7 @@ public class DroneArena {	// Drone arena
 	 * method for updating drone x/y positions in the simulation loop
 	 */
 	public void update() {
-		moveAllPlayers();		
+		moveAllentities();		
 	}
 
 	/**
@@ -71,15 +66,29 @@ public class DroneArena {	// Drone arena
 	public void addObject(char type) {
 		int x, y;
 		
+		// Randomly generate x and y
 		do {
 			x = randomGenerator.nextInt(this.xSize - 52) + 1;
 			y = randomGenerator.nextInt(this.ySize - 52) + 1;
-		} while (getDroneAt(x, y, 50, 50) != null);
+		} while (getEntityAt(x, y, 50, 50) != null);	// generate x and y until empty space found
 		
-		if (getDroneAt(x, y, 50, 50) == null) {
-			if (type == 'r') this.players.add(new Drone(x, y));
-			if (type == 's') this.players.add(new StrongDrone(x, y));
-			if (type == 'o') this.obstacles.add(new Obstacle(x, y));
+		// Double check if there's no object in that spot
+		if (getEntityAt(x, y, 50, 50) == null) {
+			if (type == 'r') this.entities.add(new Drone(x, y));
+			if (type == 's') this.entities.add(new StrongDrone(x, y));
+			if (type == 'o') this.entities.add(new Obstacle(x, y));
+		}
+	}
+
+	/**
+	 * add drone to the list with x and y coordinates
+	 */
+	public void addObject(double x, double y, char type) {
+
+		if (getEntityAt(x, y, 50, 50) == null) {
+			if (type == 'r') this.entities.add(new Drone(x, y));
+			if (type == 's') this.entities.add(new StrongDrone(x, y));
+			if (type == 'o') this.entities.add(new Obstacle(x, y));
 		}
 	}
 	
@@ -88,29 +97,24 @@ public class DroneArena {	// Drone arena
 	 * @param c
 	 */
 	public void drawEntities(UICanvas c) {
-		Player playerToRemove = null;
+		Entity playerToRemove = null;
 
-		// Displaying players
-		for (Player p : players) {
-			Player player = p.displayPlayer(c);
+		// Displaying entities
+		for (Entity p : entities) {
+			Entity player = p.displayPlayer(c);
 			if (player != null) playerToRemove = player;
-		}
-
-		// Displaying obstacles
-		for (Obstacle o : obstacles) {
-			o.displayObstacle(c);
 		}
 		
 		if (playerToRemove != null) {
-			players.remove(playerToRemove);
+			entities.remove(playerToRemove);
 		}
 	}
 	
 	/**
 	 * moving all drones
 	 */
-	public void moveAllPlayers() {
-		for (Player p : players) {
+	public void moveAllentities() {
+		for (Entity p : entities) {
 			p.tryToMove(this);
 		}
 	}
@@ -121,49 +125,55 @@ public class DroneArena {	// Drone arena
 	 * @param y
 	 * @return null if no Drone there, otherwise return drone
 	 */
-	public Player getDroneAt(double x, double y, int playersXSize, int playersYSize) {
-		Player drone = null;
+	public Entity getEntityAt(double x, double y, int entitiesXSize, int entitiesYSize) {
+		Entity drone = null;
 		
-		for(Player p : players) {
+		for(Entity p : entities) {
 			// If drone is at the location - return it
-			if (p.isHere(x, y, playersXSize, playersYSize)) {
+			if (p.isHere(x, y, entitiesXSize, entitiesYSize)) {
 				return p;
 			}
 		}
+		
 		return drone;
 	}
 	
-	public int checkPlayerLocation(double x, double y, double angle, int playersXSize, int playersYSize, int id, char type) {
-//		Drone drone = null;
-		
-		for(Player p : players) {
+	/**
+	 * Checking player's location for collision detection
+	 * @param x
+	 * @param y
+	 * @param angle
+	 * @param entitiesXSize
+	 * @param entitiesYSize
+	 * @param id
+	 * @param type
+	 * @return
+	 */
+	public int checkPlayerLocation(double x, double y, double angle, int entitiesXSize, int entitiesYSize, int id, char type) {		
+		for(Entity p : entities) {
 			// If vertical collision - return 1
-			if (p.collisionCheck(x, y, angle, playersXSize, playersYSize) == 1 && p.getID() != id) {
+			if (p.collisionCheck(x, y, angle, entitiesXSize, entitiesYSize) == 1 && p.getID() != id) {
 				if (p.type == 's' && type == 's') {
 					return 1;					
 				} else if (p.type == 's') {
 					return 3;
+				} else if (p.type == 'o') {
+					return 5;
 				} else {
 					return 1;					
 				}
 			}
 			// If horizontal collision - return 2
-			else if (p.collisionCheck(x, y, angle, playersXSize, playersYSize) == 2 && p.getID() != id) {
+			else if (p.collisionCheck(x, y, angle, entitiesXSize, entitiesYSize) == 2 && p.getID() != id) {
 				if (p.type == 's' && type == 's') {
 					return 2;					
 				} else if (p.type == 's') {
 					return 4;
+				} else if (p.type == 'o') {
+					return 6;
 				} else {
 					return 2;										
 				}
-			}
-		}
-		
-		for (Obstacle o : obstacles) {
-			if (o.collisionCheck(x, y, angle, playersXSize, playersYSize) == 1) {
-				return 5;					
-			}else if (o.collisionCheck(x, y, angle, playersXSize, playersYSize) == 2) {
-				return 6;					
 			}
 		}
 		
@@ -176,7 +186,7 @@ public class DroneArena {	// Drone arena
 	public String toString() {
 		String str = "Arena size: x = " + xSize + " y = " + ySize + "\n\n";
 
-		for (Player i : players) {
+		for (Entity i : entities) {
 			str += i.toString()  + "\n";
 		}
 		return str;
