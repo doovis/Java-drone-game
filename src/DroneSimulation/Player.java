@@ -188,7 +188,8 @@ public abstract class Player {
 	 * @param arena
 	 */
 	public void tryToMove(DroneArena arena) {
-		// drone to drone collision detection
+		// object to object collision detection
+		// regular to regular / strong to strong drones
 		if (arena.checkPlayerLocation(x, y, angle, drnxSize, drnySize, id, type) == 1) {
 			this.health = this.health - 1;
 			this.angle = -angle;
@@ -196,11 +197,20 @@ public abstract class Player {
 			this.health = this.health - 1;
 			this.angle = 180 - angle;
 		}
+
+		//  strong to regular drones
 		if (arena.checkPlayerLocation(x, y, angle, drnxSize, drnySize, id, type) == 3) {
 			this.health = this.health - 4;
 			this.angle = -angle;
 		} else if (arena.checkPlayerLocation(x, y, angle, drnxSize, drnySize, id, type) == 4) {
 			this.health = this.health - 4;
+			this.angle = 180 - angle;
+		}
+		
+		// drones to obstacles
+		if (arena.checkPlayerLocation(x, y, angle, drnxSize, drnySize, id, type) == 5) {
+			this.angle = -angle;
+		} else if (arena.checkPlayerLocation(x, y, angle, drnxSize, drnySize, id, type) == 6) {
 			this.angle = 180 - angle;
 		}
 		
@@ -233,7 +243,7 @@ public abstract class Player {
 	 * info about player
 	 */
 	public String toString() {
-		return "Player " + id + " is at " + (int)x + ", " + (int)y + ", angle " + (int)(angle % 360) + ", health " + health;
+		return "Player " + "\t" + id + " is at " + (int)x + ", " + (int)y + " angle " + (int)(angle % 360) + ", health " + health;
 	}
 		
 }

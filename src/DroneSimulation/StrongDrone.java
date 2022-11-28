@@ -61,6 +61,6 @@ public class StrongDrone extends Player {
 	 * info about drone
 	 */
 	public String toString() {
-		return "Strong D " + id + " is at " + (int)x + ", " + (int)y + ", angle " + (int)(angle % 360) + ", health " + health;
+		return "Strong D " + "\t" + id + " is at " + (int)x + ", " + (int)y + " angle " + (int)(angle % 360) + ", health " + health;
 	}
 }

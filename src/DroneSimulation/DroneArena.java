@@ -12,6 +12,7 @@ import javafx.scene.paint.Color;
 public class DroneArena {	// Drone arena
 	private int xSize, ySize;		// Arena size
 	ArrayList<Player> players;	// Drones array
+	ArrayList<Obstacle> obstacles;	// obstacles array
 	Random randomGenerator;	// Random object
 	Image bg;
 	
@@ -24,9 +25,10 @@ public class DroneArena {	// Drone arena
 	DroneArena(int w, int h) {
 		this.xSize = w;
 		this.ySize = h;
-		this.bg = new Image(getClass().getResourceAsStream("./img/apocalypticBG.jpg"));
+		this.bg = new Image(getClass().getResourceAsStream("./img/background.png"));
 		randomGenerator = new Random();
 		players = new ArrayList<Player>();
+		obstacles = new ArrayList<Obstacle>();
 	}
 	
 	/**
@@ -60,15 +62,13 @@ public class DroneArena {	// Drone arena
 	public void drawObjects(UICanvas canvas, GraphicsContext gc) {
 		canvas.clearCanvas();
 		canvas.drawImage(bg, 0, 0, xSize, ySize);
-//		gc.setFill(Color.color(0.9, 0.9, 0.9, 1));
-//		gc.fillRect(0, 0, xSize, ySize);
-		drawPlayers(canvas);
+		drawEntities(canvas);
 	}
 
 	/**
 	 * add drone to the list with random coordinates
 	 */
-	public void addDrone(char type) {
+	public void addObject(char type) {
 		int x, y;
 		
 		do {
@@ -79,6 +79,7 @@ public class DroneArena {	// Drone arena
 		if (getDroneAt(x, y, 50, 50) == null) {
 			if (type == 'r') this.players.add(new Drone(x, y));
 			if (type == 's') this.players.add(new StrongDrone(x, y));
+			if (type == 'o') this.obstacles.add(new Obstacle(x, y));
 		}
 	}
 	
@@ -86,12 +87,20 @@ public class DroneArena {	// Drone arena
 	 * display drones present in the list
 	 * @param c
 	 */
-	public void drawPlayers(UICanvas c) {
+	public void drawEntities(UICanvas c) {
 		Player playerToRemove = null;
+
+		// Displaying players
 		for (Player p : players) {
 			Player player = p.displayPlayer(c);
 			if (player != null) playerToRemove = player;
 		}
+
+		// Displaying obstacles
+		for (Obstacle o : obstacles) {
+			o.displayObstacle(c);
+		}
+		
 		if (playerToRemove != null) {
 			players.remove(playerToRemove);
 		}
@@ -149,6 +158,15 @@ public class DroneArena {	// Drone arena
 				}
 			}
 		}
+		
+		for (Obstacle o : obstacles) {
+			if (o.collisionCheck(x, y, angle, playersXSize, playersYSize) == 1) {
+				return 5;					
+			}else if (o.collisionCheck(x, y, angle, playersXSize, playersYSize) == 2) {
+				return 6;					
+			}
+		}
+		
 		return 0;
 	}
 	

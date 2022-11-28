@@ -59,6 +59,6 @@ public class Drone extends Player {				// Drone class
 	 * info about drone
 	 */
 	public String toString() {
-		return "Drone " + id + " is at " + (int)x + ", " + (int)y + ", angle " + (int)(angle % 360) + ", health " + health;
+		return "Drone " + "\t" + id + " is at " + (int)x + ", " + (int)y + " angle " + (int)(angle % 360) + ", health " + health;
 	}
 }

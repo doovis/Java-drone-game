@@ -26,10 +26,13 @@ import javafx.scene.control.ToolBar;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -275,13 +278,13 @@ public class DroneInterface extends Application {
 		Image play = new Image(getClass().getResourceAsStream("./img/play.png"));
 		Image pause = new Image(getClass().getResourceAsStream("./img/pause.png"));
 		Image plus = new Image(getClass().getResourceAsStream("./img/plus.png"));
-		
+				
 		
 		// animation on button
 		ImageView playImg = new ImageView(play);
 		playImg.setFitHeight(30);
 		playImg.setFitWidth(30);
-		Button btnAnimOn = new Button("Start Animation", playImg);
+		Button btnAnimOn = new Button("START ANIMATION", playImg);
 		btnAnimOn.getStyleClass().add("buttons");
 		// animation on handler
 		btnAnimOn.setOnAction(new EventHandler<ActionEvent>() {
@@ -295,7 +298,7 @@ public class DroneInterface extends Application {
 		ImageView pauseImg = new ImageView(pause);
 		pauseImg.setFitHeight(30);
 		pauseImg.setFitWidth(30);
-		Button btnAnimOff = new Button("Stop Animation", pauseImg);
+		Button btnAnimOff = new Button("STOP ANIMATION", pauseImg);
 		btnAnimOff.getStyleClass().add("buttons");
 		// animation off handler
 		btnAnimOff.setOnAction(new EventHandler<ActionEvent>() {
@@ -309,13 +312,13 @@ public class DroneInterface extends Application {
 		ImageView addImg = new ImageView(plus);
 		addImg.setFitHeight(30);
 		addImg.setFitWidth(30);
-		Button addplayersbtn = new Button("Add drone", addImg);
+		Button addplayersbtn = new Button("ADD DRONE", addImg);
 		addplayersbtn.getStyleClass().add("buttons");
 		// add drone handler
 		addplayersbtn.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
 				if (animationOn) {
-					arena.addDrone('r');					
+					arena.addObject('r');					
 				}
 			}
 		});
@@ -324,19 +327,35 @@ public class DroneInterface extends Application {
 		ImageView addImg2 = new ImageView(plus);
 		addImg2.setFitHeight(30);
 		addImg2.setFitWidth(30);
-		Button addStrplayersbtn = new Button("Add Strong drone", addImg2);
+		Button addStrplayersbtn = new Button("ADD STRONG DRONE", addImg2);
 		addStrplayersbtn.getStyleClass().add("buttons");
 		// add drone handler
 		addStrplayersbtn.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
 				if (animationOn) {
-					arena.addDrone('s');
+					arena.addObject('s');
 				}
 			}
 		});
 
-		HBox btnBox = new HBox(btnAnimOn, btnAnimOff, addplayersbtn, addStrplayersbtn);
+		// add Stone obstacle button
+		ImageView addImg3 = new ImageView(plus);
+		addImg3.setFitHeight(30);
+		addImg3.setFitWidth(30);
+		Button addObstaclebtn = new Button("ADD OBSTACLE", addImg3);
+		addObstaclebtn.getStyleClass().add("buttons");
+		// add drone handler
+		addObstaclebtn.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent event) {
+				if (animationOn) {
+					arena.addObject('o');
+				}
+			}
+		});
+
+		HBox btnBox = new HBox(btnAnimOn, btnAnimOff, addplayersbtn, addStrplayersbtn, addObstaclebtn);
 		btnBox.getStyleClass().add("button-box");
+		btnBox.setSpacing(10);
 		
 		return btnBox;
 	}
@@ -347,41 +366,63 @@ public class DroneInterface extends Application {
 		rtPane = new VBox();
 		rtPane.getStyleClass().add("drone-info-box");
 		rtPane.setAlignment(Pos.TOP_LEFT);
+		rtPane.setMinWidth(304);
+		rtPane.setMinHeight(canvasHeight - 1);
 		
+		// Players list
 		for (int i = 0; i < arena.players.size(); i++) {
 			Label l = new Label(arena.players.get(i).toString());
+			l.setTextFill(Color.WHITE);
+			rtPane.getChildren().addAll(l);		
+		}
+
+		// obstacles list
+		for (int i = 0; i < arena.obstacles.size(); i++) {
+			Label l = new Label(arena.obstacles.get(i).toString());
+			l.setTextFill(Color.WHITE);
 			rtPane.getChildren().addAll(l);		
 		}
 		
 		// Adding VBox into the scroll pane
 		scroll.setContent(rtPane);
-		scroll.setMinViewportWidth(250);
+		scroll.setPrefViewportWidth(290);
+		scroll.setMinViewportWidth(290);
 		scroll.setMinViewportHeight(canvasHeight - 15);
 		scroll.setMaxHeight(canvasHeight);
+		scroll.getStyleClass().add("list-inside");
+
+		VBox list = new VBox(listLabel(), scroll);
 		
-		return new VBox(listLabel(), scroll);
+		list.getStyleClass().add("list");
+
+		
+		return list;
 	}
 
 	private VBox setCanvas(Group root) {
-		return new VBox(canvasLabel(), root);
+		VBox cnv = new VBox(canvasLabel(), root);
+		
+		cnv.getStyleClass().add("canvas");
+		
+		return cnv;
 	}
 	
 	private Text canvasLabel() {
-		Text title = new Text("Drone arena");
+		Text title = new Text("ARENA");
 		
-		title.setFont(Font.font("arial", FontWeight.NORMAL, 27));
-		title.setFill(Color.rgb(50, 50, 50));
+		title.setFont(Font.font("agency FB", FontWeight.NORMAL, 36));
+		title.setFill(Color.rgb(255, 255, 255));
 		title.setTranslateX(canvasWidth / 2 - 50);
 		
 		return title;
 	}
 
 	private Text listLabel() {
-		Text title = new Text("Drone info");
+		Text title = new Text("PLAYER INFO");
 
-		title.setFont(Font.font("arial", FontWeight.NORMAL, 27));
-		title.setFill(Color.rgb(50, 50, 50));
-		title.setTranslateX(60);
+		title.setFont(Font.font("agency FB", FontWeight.NORMAL, 36));
+		title.setFill(Color.rgb(255, 255, 255));
+		title.setTranslateX(80);
 		
 		return title;
 	}
@@ -397,9 +438,11 @@ public class DroneInterface extends Application {
 		BorderPane bp = new BorderPane();
 		ScrollPane scroll = new ScrollPane();
 		Canvas canvas = new Canvas(canvasWidth, canvasHeight);
-		
 		Scene scene = new Scene(bp, canvasWidth * 1.3, canvasHeight * 1.3);
+		
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+//		scroll.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+
 		gc = canvas.getGraphicsContext2D();
 		cnv = new UICanvas(gc, canvasWidth, canvasHeight);
 		arena = new DroneArena(canvasWidth, canvasHeight);
