@@ -7,6 +7,7 @@ import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -49,6 +50,7 @@ public class DroneInterface extends Application {
 	int canvasWidth = 1024;
 	int canvasHeight = 576;
 	boolean animationOn = true;
+	boolean deleteButton = false;
 	boolean obstacleButton = false;
 	private VBox rtPane;
 	private UICanvas cnv;
@@ -190,7 +192,9 @@ public class DroneInterface extends Application {
 					}
 				}
 				bufReader.close();
-
+				
+				// Drawing updated canvas
+				arena.drawObjects(cnv, gc);
 				System.out.println("Arena loaded from a file: " + file.getName() + "\n");
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -231,7 +235,7 @@ public class DroneInterface extends Application {
 						+ "Right side contains a list of every entity in the simulation and reports its location or angle and health for drone entitities.\n"
 						+ "Bottom part contains interactive control buttons which let user interact with the simulation.\n"
 						+ "Start/Pause animation - these buttons allow user to pause or resume the animation.\n"
-						+ "Add drone/strong drone/obstacle - buttons allow user to add mentioned entities to the arena.";
+						+ "Add drone/strong drone/obstacle and remove entity - buttons allow user to add/remove mentioned entities to/from the arena.";
 				cnv.dialogBox("Help", message);
 			}
 		});
@@ -281,7 +285,7 @@ public class DroneInterface extends Application {
 		return menuBar;								// returning menu bar
 	}
 	
-	private HBox setControlButtons(Canvas canvas) {	
+	private HBox setControlButtons(Canvas canvas, Scene scene) {	
 		Image play = new Image(getClass().getResourceAsStream("./img/play.png"));
 		Image pause = new Image(getClass().getResourceAsStream("./img/pause.png"));
 		Image plus = new Image(getClass().getResourceAsStream("./img/plus.png"));
@@ -298,8 +302,10 @@ public class DroneInterface extends Application {
 		btnAnimOn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
+				scene.setCursor(Cursor.DEFAULT);
 				animationOn = true;
 				obstacleButton = false;
+				deleteButton = false;
 			}
 		});
 
@@ -314,6 +320,7 @@ public class DroneInterface extends Application {
 		btnAnimOff.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
+				scene.setCursor(Cursor.DEFAULT);
 				animationOn = false;
 			}
 		});
@@ -328,6 +335,7 @@ public class DroneInterface extends Application {
 		// add drone handler
 		addEntitiesBtn.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
+				scene.setCursor(Cursor.DEFAULT);
 				if (animationOn) {
 					arena.addObject('r');					
 				} else {
@@ -346,6 +354,7 @@ public class DroneInterface extends Application {
 		// add drone handler
 		addStrEntitiesBtn.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
+				scene.setCursor(Cursor.DEFAULT);
 				if (animationOn) {
 					arena.addObject('s');
 				} else {
@@ -364,7 +373,9 @@ public class DroneInterface extends Application {
 		// add drone handler
 		addObstaclebtn.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
+				scene.setCursor(Cursor.DEFAULT);
 				if (!animationOn) {
+					deleteButton = false;
 					obstacleButton = true;
 				} else {
 					cnv.dialogBox("Stop animation", "In order to add an obstacle please stop animation.");
@@ -372,7 +383,28 @@ public class DroneInterface extends Application {
 			}
 		});
 
-		HBox btnBox = new HBox(btnAnimOn, btnAnimOff, addEntitiesBtn, addStrEntitiesBtn, addObstaclebtn);
+		// delete entities button
+		ImageView addImg4 = new ImageView(plus);
+		addImg4.setFitHeight(30);
+		addImg4.setFitWidth(30);
+		Button deleteEntitybtn = new Button("REMOVE ENTITY", addImg4);
+		deleteEntitybtn.setPrefWidth(btnSize);
+		deleteEntitybtn.getStyleClass().add("buttons");
+		// add drone handler
+		deleteEntitybtn.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent event) {
+				scene.setCursor(Cursor.DEFAULT);
+				if (!animationOn) {
+					arena.drawObjects(cnv, gc);
+					obstacleButton = false;
+					deleteButton = true;
+				} else {
+					cnv.dialogBox("Stop animation", "In order to delete an entity please stop animation.");
+				}
+			}
+		});
+
+		HBox btnBox = new HBox(btnAnimOn, btnAnimOff, addEntitiesBtn, addStrEntitiesBtn, addObstaclebtn, deleteEntitybtn);
 		btnBox.getStyleClass().add("button-box");
 		btnBox.setSpacing(10);
 		
@@ -413,7 +445,7 @@ public class DroneInterface extends Application {
 	
 	
 	// Mouse event handler for obstacle addition
-	public void mouseEvent(Canvas canvas) {
+	public void mouseEvent(Canvas canvas, ScrollPane scroll, BorderPane bp, Scene scene) {
 		// Mouse movement handler
 		canvas.addEventHandler(MouseEvent.MOUSE_MOVED, 
 			new EventHandler<MouseEvent>() {
@@ -425,6 +457,9 @@ public class DroneInterface extends Application {
 					Obstacle o = new Obstacle(e.getX() - 20, e.getY() - 20);
 					o.displayPlayer(cnv);
 				}
+				if (!animationOn && deleteButton) {
+					scene.setCursor(Cursor.CROSSHAIR);
+				}
 			}
 		});
 		
@@ -435,20 +470,47 @@ public class DroneInterface extends Application {
 			public void handle(MouseEvent e) {
 				if (!animationOn && obstacleButton) {
 					boolean isHere = false;
+					// Looking for object in this position
 					for (Entity p : arena.entities) {
 						if (p.isHere(e.getX() - (p.getXSize() / 2), e.getY() - (p.getYSize() / 2), p.getXSize(), p.getYSize())) {
 							isHere = true;
 						}
 					}
+					
+					// If object not found
 					if (!isHere) {
 						arena.addObject(e.getX() - 20, e.getY() - 20, 'o');
 						obstacleButton = false;
+						
+						// Updating drone list
+						bp.setRight(setDroneInfoList(scroll));
 					} else {
 						cnv.dialogBox("Occupied space", "Please place the obstacle in an unoccupied area.");
 					}
 				}
-			}
-		});
+				
+				if (!animationOn && deleteButton) {
+					boolean found = false;
+					// Looking for object in this position
+					for (Entity p : arena.entities) {
+						if (p.isHere(e.getX() - (p.getXSize() / 2), e.getY() - (p.getYSize() / 2), p.getXSize(), p.getYSize())) {
+							found = true;
+							arena.entities.remove(p);
+							deleteButton = false;
+							arena.drawObjects(cnv, gc);
+							
+							// Updating drone list
+							bp.setRight(setDroneInfoList(scroll));
+							break;
+						}
+					}
+					// If object not found
+					if (!found) {
+						cnv.dialogBox("Occupied space", "Please select an object to remove.");				
+					}
+				}
+				scene.setCursor(Cursor.DEFAULT);
+			}});
 	}
 
 	/**
@@ -506,11 +568,11 @@ public class DroneInterface extends Application {
 		bp.setTop(setMenu());
 		bp.setCenter(setCanvas(root));
 		bp.setRight(setDroneInfoList(scroll));
-		bp.setBottom(setControlButtons(canvas));
+		bp.setBottom(setControlButtons(canvas, scene));
 		
 		// Adding canvas into the group
 		root.getChildren().add(canvas);
-		mouseEvent(canvas);
+		mouseEvent(canvas, scroll, bp, scene);
 
 		// Starting animation loop
 //		final long startNanoTime = System.nanoTime();
