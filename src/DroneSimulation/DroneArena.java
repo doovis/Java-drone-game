@@ -8,9 +8,9 @@ import javafx.scene.image.Image;
 
 public class DroneArena {	// Drone arena
 	private int xSize, ySize;		// Arena size
-	ArrayList<Entity> entities;	// Drones array
-	Random randomGenerator;	// Random object
-	Image bg;
+	private Image bg;
+	protected ArrayList<Entity> entities;	// Drones array
+	protected Random randomGenerator;	// Random object
 	
 	/**
 	 * drone arena constructor initialising arena's size, 

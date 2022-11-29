@@ -3,7 +3,7 @@ package DroneSimulation;
 import javafx.scene.image.Image;
 
 public class StrongDrone extends Entity {
-	Image drone4, drone3, drone2, drone1;
+	private Image drone4, drone3, drone2, drone1;
 
 	
 	/**

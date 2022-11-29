@@ -3,7 +3,7 @@ package DroneSimulation;
 import javafx.scene.image.Image;
 
 public class Obstacle extends Entity {
-	Image stone;
+	private Image stone;
 
 	
 	/**

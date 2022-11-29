@@ -14,6 +14,9 @@
 }
 
 .buttons {
+	-fx-background-image: url('./img/button.png');
+	-fx-background-size: 190 43;
+	-fx-background-radius: 20;
 	-fx-font-size: 20px;
 	-fx-font-family: "agency FB";
 }

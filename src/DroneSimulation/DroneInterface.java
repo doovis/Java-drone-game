@@ -20,6 +20,11 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -45,10 +50,10 @@ public class DroneInterface extends Application {
 	int canvasHeight = 576;
 	boolean animationOn = true;
 	boolean obstacleButton = false;
+	private VBox rtPane;
+	private UICanvas cnv;
+	private DroneArena arena;
 	GraphicsContext gc;
-	VBox rtPane;
-	UICanvas cnv;
-	DroneArena arena;
 
 //	    		/**
 //	    		 * Creating a new arena
@@ -176,7 +181,7 @@ public class DroneInterface extends Application {
 					if ((int)playerInfo[3].charAt(0) == 111) {	// 111 == 'o'
 						Obstacle obstacle = new Obstacle(Double.parseDouble(playerInfo[0]), Double.parseDouble(playerInfo[1]), Integer.parseInt(playerInfo[2]));
 						arena.entities.add(obstacle);
-					} else if ((int)playerInfo[5].charAt(0) == 114) {		// 114 == 'o'
+					} else if ((int)playerInfo[5].charAt(0) == 114) {		// 114 == 'r'
 						Drone player = new Drone(Double.parseDouble(playerInfo[0]), Double.parseDouble(playerInfo[1]), Integer.parseInt(playerInfo[2]), Integer.parseInt(playerInfo[3]), Integer.parseInt(playerInfo[4]));
 						arena.entities.add(player);
 					} else if ((int)playerInfo[5].charAt(0) == 115) {	// 115 == 's'
@@ -280,13 +285,14 @@ public class DroneInterface extends Application {
 		Image play = new Image(getClass().getResourceAsStream("./img/play.png"));
 		Image pause = new Image(getClass().getResourceAsStream("./img/pause.png"));
 		Image plus = new Image(getClass().getResourceAsStream("./img/plus.png"));
-				
+		int btnSize = 190;
 		
 		// animation on button
 		ImageView playImg = new ImageView(play);
 		playImg.setFitHeight(30);
 		playImg.setFitWidth(30);
 		Button btnAnimOn = new Button("START ANIMATION", playImg);
+		btnAnimOn.setPrefWidth(btnSize);
 		btnAnimOn.getStyleClass().add("buttons");
 		// animation on handler
 		btnAnimOn.setOnAction(new EventHandler<ActionEvent>() {
@@ -302,6 +308,7 @@ public class DroneInterface extends Application {
 		pauseImg.setFitHeight(30);
 		pauseImg.setFitWidth(30);
 		Button btnAnimOff = new Button("STOP ANIMATION", pauseImg);
+		btnAnimOff.setPrefWidth(btnSize);
 		btnAnimOff.getStyleClass().add("buttons");
 		// animation off handler
 		btnAnimOff.setOnAction(new EventHandler<ActionEvent>() {
@@ -315,10 +322,11 @@ public class DroneInterface extends Application {
 		ImageView addImg = new ImageView(plus);
 		addImg.setFitHeight(30);
 		addImg.setFitWidth(30);
-		Button addentitiesbtn = new Button("ADD DRONE", addImg);
-		addentitiesbtn.getStyleClass().add("buttons");
+		Button addEntitiesBtn = new Button("ADD DRONE", addImg);
+		addEntitiesBtn.setPrefWidth(btnSize);
+		addEntitiesBtn.getStyleClass().add("buttons");
 		// add drone handler
-		addentitiesbtn.setOnAction(new EventHandler<ActionEvent>() {
+		addEntitiesBtn.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
 				if (animationOn) {
 					arena.addObject('r');					
@@ -332,10 +340,11 @@ public class DroneInterface extends Application {
 		ImageView addImg2 = new ImageView(plus);
 		addImg2.setFitHeight(30);
 		addImg2.setFitWidth(30);
-		Button addStrentitiesbtn = new Button("ADD STRONG DRONE", addImg2);
-		addStrentitiesbtn.getStyleClass().add("buttons");
+		Button addStrEntitiesBtn = new Button("ADD STRONG DRONE", addImg2);
+		addStrEntitiesBtn.setPrefWidth(btnSize);
+		addStrEntitiesBtn.getStyleClass().add("buttons");
 		// add drone handler
-		addStrentitiesbtn.setOnAction(new EventHandler<ActionEvent>() {
+		addStrEntitiesBtn.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
 				if (animationOn) {
 					arena.addObject('s');
@@ -344,12 +353,13 @@ public class DroneInterface extends Application {
 				}
 			}
 		});
-
+		
 		// add Stone obstacle button
 		ImageView addImg3 = new ImageView(plus);
 		addImg3.setFitHeight(30);
 		addImg3.setFitWidth(30);
 		Button addObstaclebtn = new Button("ADD OBSTACLE", addImg3);
+		addObstaclebtn.setPrefWidth(btnSize);
 		addObstaclebtn.getStyleClass().add("buttons");
 		// add drone handler
 		addObstaclebtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -362,7 +372,7 @@ public class DroneInterface extends Application {
 			}
 		});
 
-		HBox btnBox = new HBox(btnAnimOn, btnAnimOff, addentitiesbtn, addStrentitiesbtn, addObstaclebtn);
+		HBox btnBox = new HBox(btnAnimOn, btnAnimOff, addEntitiesBtn, addStrEntitiesBtn, addObstaclebtn);
 		btnBox.getStyleClass().add("button-box");
 		btnBox.setSpacing(10);
 		

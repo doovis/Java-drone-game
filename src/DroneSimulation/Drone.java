@@ -3,7 +3,7 @@ package DroneSimulation;
 import javafx.scene.image.Image;
 
 public class Drone extends Entity {				// Drone class
-	Image drone4, drone3, drone2, drone1;
+	private Image drone4, drone3, drone2, drone1;
 
 	/**
 	 * Drone constructor initialising coordinates, deltas, 
@@ -41,15 +41,15 @@ public class Drone extends Entity {				// Drone class
 	 * @param c
 	 */
 	public Drone displayPlayer(UICanvas c) {
-		if (this.health == 4) {
-			c.drawImage(drone4, this.x, this.y, entxSize, entySize);
-		} else if (this.health == 3) {
-			c.drawImage(drone3, this.x, this.y, entxSize, entySize);
-		} else if (this.health == 2) {
-			c.drawImage(drone2, this.x, this.y, entxSize, entySize);
-		} else if (this.health == 1) {
-			c.drawImage(drone1, this.x, this.y, entxSize, entySize);
-		} else if (this.health < 1) {
+		if (health == 4) {
+			c.drawImage(drone4, x, y, entxSize, entySize);
+		} else if (health == 3) {
+			c.drawImage(drone3, x, y, entxSize, entySize);
+		} else if (health == 2) {
+			c.drawImage(drone2, x, y, entxSize, entySize);
+		} else if (health == 1) {
+			c.drawImage(drone1, x, y, entxSize, entySize);
+		} else if (health < 1) {
 			return this;
 		}
 		return null;

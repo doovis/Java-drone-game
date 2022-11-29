@@ -6,7 +6,7 @@ public abstract class Entity {
 	protected double x, dx, y, dy;	// Coordinates, delta x and y
 	protected int id, angle, health, entxSize, entySize;
 	protected char type;
-	protected static int count = 0;	// Id increment helper
+	private static int count = 0;	// Id increment helper
 
 	
 	/**
@@ -19,8 +19,8 @@ public abstract class Entity {
 	Entity(double X, double Y, char Type) {
 		this.x = X;
 		this.y = Y;
-		this.dx = 2.0;
-		this.dy = 2.0;
+		this.dx = 2;
+		this.dy = 2;
 		this.entxSize = 40;
 		this.entySize = 40;
 		this.health = 4;
@@ -211,7 +211,7 @@ public abstract class Entity {
 		} else if (arena.checkPlayerLocation(x, y, angle, entxSize, entySize, id, type) == 6) {
 			this.angle = 180 - angle;
 		}
-		
+
 		// Arena border collision detection
 		if (y < 1) {
 			this.y = 1;
@@ -242,6 +242,5 @@ public abstract class Entity {
 	 */
 	public String toString() {
 		return "Player " + "\t" + id + " is at " + (int)x + ", " + (int)y + " angle " + (int)(angle % 360) + ", health " + health;
-	}
-		
+	}	
 }
