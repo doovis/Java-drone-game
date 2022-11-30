@@ -5,6 +5,7 @@ import java.util.Random;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
 
 public class DroneArena {	// Drone arena
 	private int xSize, ySize;		// Arena size
@@ -77,6 +78,7 @@ public class DroneArena {	// Drone arena
 			if (type == 'r') this.entities.add(new Drone(x, y));
 			if (type == 's') this.entities.add(new StrongDrone(x, y));
 			if (type == 'o') this.entities.add(new Obstacle(x, y));
+			if (type == 'd') this.entities.add(new DeceptiveDrone(x, y));
 		}
 	}
 
@@ -89,6 +91,7 @@ public class DroneArena {	// Drone arena
 			if (type == 'r') this.entities.add(new Drone(x, y));
 			if (type == 's') this.entities.add(new StrongDrone(x, y));
 			if (type == 'o') this.entities.add(new Obstacle(x, y));
+			if (type == 'd') this.entities.add(new DeceptiveDrone(x, y));
 		}
 	}
 	
@@ -115,6 +118,9 @@ public class DroneArena {	// Drone arena
 	 */
 	public void moveAllentities() {
 		for (Entity p : entities) {
+//			if (p.intruder == "n") {
+//				p.circleColor = Color.rgb(0, 0, 0, 0.25);
+//			}
 			p.tryToMove(this);
 		}
 	}
@@ -149,7 +155,7 @@ public class DroneArena {	// Drone arena
 	 * @param type
 	 * @return
 	 */
-	public int checkPlayerLocation(double x, double y, double angle, int entitiesXSize, int entitiesYSize, int id, char type) {		
+	public int checkPlayerLocation(double x, double y, double angle, int entitiesXSize, int entitiesYSize, int id, char type, Color circleColor) {		
 		for(Entity p : entities) {
 			// If vertical collision - return 1
 			if (p.collisionCheck(x, y, angle, entitiesXSize, entitiesYSize) == 1 && p.getID() != id) {
@@ -163,6 +169,7 @@ public class DroneArena {	// Drone arena
 					return 1;					
 				}
 			}
+			
 			// If horizontal collision - return 2
 			else if (p.collisionCheck(x, y, angle, entitiesXSize, entitiesYSize) == 2 && p.getID() != id) {
 				if (p.type == 's' && type == 's') {
@@ -173,6 +180,13 @@ public class DroneArena {	// Drone arena
 					return 6;
 				} else {
 					return 2;										
+				}
+			}
+
+			if (p.type == 'd' && type != 'd' && type != 'o') {
+				// If crossed deceptive drone's scanner circle
+				if (p.circleDetection(x, y, angle, entitiesXSize, entitiesYSize) && p.getID() != id) {
+					return 7;
 				}
 			}
 		}

@@ -55,8 +55,8 @@ public class UICanvas {
 	 * @param ySize
 	 * @param color
 	 */
-	public void drawRectangle(int x, int y, int xSize, int ySize, Color color) {
+	public void drawOval(int x, int y, int xSize, int ySize, Color color) {
 		gc.setFill(color);
-		gc.fillRect(x, y, xSize, ySize);
+		gc.fillOval(x, y, xSize, ySize);
 	}
 }

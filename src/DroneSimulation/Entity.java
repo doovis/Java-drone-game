@@ -2,12 +2,15 @@ package DroneSimulation;
 
 import java.util.Random;
 
+import javafx.scene.paint.Color;
+
 public abstract class Entity {
 	protected double x, dx, y, dy;	// Coordinates, delta x and y
-	protected int id, angle, health, entxSize, entySize;
+	protected int id, angle, health, entxSize, entySize, diameter;
 	protected char type;
+	protected Color circleColor;
+	protected String intruder;
 	private static int count = 0;	// Id increment helper
-
 	
 	/**
 	 * Drone constructor initialising coordinates, deltas, 
@@ -27,6 +30,12 @@ public abstract class Entity {
 		this.type = Type;
 		this.angle = new Random().nextInt(360);
 		this.id = count++;
+		
+		if (Type == 'd') {
+			this.diameter = 320;
+			this.intruder = "n";
+			this.circleColor = Color.rgb(0, 0, 0, 0.25);
+		}
 	}
 
 	Entity(double X, double Y, int Angle, int Health, int ID, char Type) {
@@ -40,6 +49,12 @@ public abstract class Entity {
 		this.angle = Angle;
 		this.id = ID;
 		this.type = Type;
+		
+		if (Type == 'd') {
+			this.diameter = 320;
+			this.intruder = "n";
+//			this.circleColor = Color.rgb(0, 0, 0, 0.25);
+		}
 	}
 	
 	/**
@@ -72,6 +87,14 @@ public abstract class Entity {
 	 */
 	public int getAngle() {
 		return angle;
+	}
+
+	/**
+	 * set value of angle
+	 * @return angle
+	 */
+	public void setAngle(int Angle) {
+		angle = Angle;
 	}
 
 	/**
@@ -128,6 +151,29 @@ public abstract class Entity {
 			return true;			
 		}
 		return false;			
+	}
+	
+	public boolean circleDetection(double sx, double sy, double sangle, int drnXSize, int drnYSize) {
+		// distance between entities on x axis
+		int distanceX = (int)x + (entxSize / 2) - (int)sx + (drnXSize / 2);
+		// distance between entities on y axis
+		int distanceY = (int)y + (entySize / 2) - (int)sy + (drnYSize / 2);
+		// total distance between entities across both axis
+		int distanceXY = (int)Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+		if (distanceXY < 160) {
+//			if (type == 'd') {
+//				circleColor = Color.rgb(255, 0, 0, 0.25);
+//				intruder = "y";				
+//			}
+			return true;
+		} else {
+//			if (type == 'd') {
+//				intruder = "n";
+//			}
+			return false;
+		}
+
 	}
 	
 	/**
@@ -188,27 +234,32 @@ public abstract class Entity {
 	public void tryToMove(DroneArena arena) {
 		// object to object collision detection
 		// regular to regular / strong to strong drones
-		if (arena.checkPlayerLocation(x, y, angle, entxSize, entySize, id, type) == 1) {
+		if (arena.checkPlayerLocation(x, y, angle, entxSize, entySize, id, type, circleColor) == 1) {
 			this.health = this.health - 1;
 			this.angle = -angle;
-		} else if (arena.checkPlayerLocation(x, y, angle, entxSize, entySize, id, type) == 2) {
+		} else if (arena.checkPlayerLocation(x, y, angle, entxSize, entySize, id, type, circleColor) == 2) {
 			this.health = this.health - 1;
 			this.angle = 180 - angle;
 		}
+		
+		// drones to deceptive drones
+		if (arena.checkPlayerLocation(x, y, angle, entxSize, entySize, id, type, circleColor) == 7) {
+			this.angle += 3;
+		} 
 
 		//  strong to regular drones
-		if (arena.checkPlayerLocation(x, y, angle, entxSize, entySize, id, type) == 3) {
+		if (arena.checkPlayerLocation(x, y, angle, entxSize, entySize, id, type, circleColor) == 3) {
 			this.health = this.health - 4;
 			this.angle = -angle;
-		} else if (arena.checkPlayerLocation(x, y, angle, entxSize, entySize, id, type) == 4) {
+		} else if (arena.checkPlayerLocation(x, y, angle, entxSize, entySize, id, type, circleColor) == 4) {
 			this.health = this.health - 4;
 			this.angle = 180 - angle;
 		}
 		
 		// drones to obstacles
-		if (arena.checkPlayerLocation(x, y, angle, entxSize, entySize, id, type) == 5) {
+		if (arena.checkPlayerLocation(x, y, angle, entxSize, entySize, id, type, circleColor) == 5) {
 			this.angle = -angle;
-		} else if (arena.checkPlayerLocation(x, y, angle, entxSize, entySize, id, type) == 6) {
+		} else if (arena.checkPlayerLocation(x, y, angle, entxSize, entySize, id, type, circleColor) == 6) {
 			this.angle = 180 - angle;
 		}
 

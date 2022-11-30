@@ -52,9 +52,13 @@ public class DroneInterface extends Application {
 	boolean animationOn = true;
 	boolean deleteButton = false;
 	boolean obstacleButton = false;
-	private VBox rtPane;
+	private VBox rtPane, rtFullPane;
+	private Text title;
+
 	private UICanvas cnv;
 	private DroneArena arena;
+	ScrollPane scroll;
+	int fpsCounter = 0;
 	GraphicsContext gc;
 
 //	    		/**
@@ -179,7 +183,6 @@ public class DroneInterface extends Application {
 					String[] playerInfo = str.get(i).split(" ");
 					
 					// Constructing new arena object and adding to the list
-					
 					if ((int)playerInfo[3].charAt(0) == 111) {	// 111 == 'o'
 						Obstacle obstacle = new Obstacle(Double.parseDouble(playerInfo[0]), Double.parseDouble(playerInfo[1]), Integer.parseInt(playerInfo[2]));
 						arena.entities.add(obstacle);
@@ -188,6 +191,9 @@ public class DroneInterface extends Application {
 						arena.entities.add(player);
 					} else if ((int)playerInfo[5].charAt(0) == 115) {	// 115 == 's'
 						StrongDrone player = new StrongDrone(Double.parseDouble(playerInfo[0]), Double.parseDouble(playerInfo[1]), Integer.parseInt(playerInfo[2]), Integer.parseInt(playerInfo[3]), Integer.parseInt(playerInfo[4]));
+						arena.entities.add(player);
+					} else if ((int)playerInfo[5].charAt(0) == 100) {	// 100 == 'd'
+						DeceptiveDrone player = new DeceptiveDrone(Double.parseDouble(playerInfo[0]), Double.parseDouble(playerInfo[1]), Integer.parseInt(playerInfo[2]), Integer.parseInt(playerInfo[3]), Integer.parseInt(playerInfo[4]));
 						arena.entities.add(player);
 					}
 				}
@@ -289,6 +295,7 @@ public class DroneInterface extends Application {
 		Image play = new Image(getClass().getResourceAsStream("./img/play.png"));
 		Image pause = new Image(getClass().getResourceAsStream("./img/pause.png"));
 		Image plus = new Image(getClass().getResourceAsStream("./img/plus.png"));
+		Image bin = new Image(getClass().getResourceAsStream("./img/bin.png"));
 		int btnSize = 190;
 		
 		// animation on button
@@ -329,7 +336,7 @@ public class DroneInterface extends Application {
 		ImageView addImg = new ImageView(plus);
 		addImg.setFitHeight(30);
 		addImg.setFitWidth(30);
-		Button addEntitiesBtn = new Button("ADD DRONE", addImg);
+		Button addEntitiesBtn = new Button("DRONE", addImg);
 		addEntitiesBtn.setPrefWidth(btnSize);
 		addEntitiesBtn.getStyleClass().add("buttons");
 		// add drone handler
@@ -348,7 +355,7 @@ public class DroneInterface extends Application {
 		ImageView addImg2 = new ImageView(plus);
 		addImg2.setFitHeight(30);
 		addImg2.setFitWidth(30);
-		Button addStrEntitiesBtn = new Button("ADD STRONG DRONE", addImg2);
+		Button addStrEntitiesBtn = new Button("STRONG DRONE", addImg2);
 		addStrEntitiesBtn.setPrefWidth(btnSize);
 		addStrEntitiesBtn.getStyleClass().add("buttons");
 		// add drone handler
@@ -367,7 +374,7 @@ public class DroneInterface extends Application {
 		ImageView addImg3 = new ImageView(plus);
 		addImg3.setFitHeight(30);
 		addImg3.setFitWidth(30);
-		Button addObstaclebtn = new Button("ADD OBSTACLE", addImg3);
+		Button addObstaclebtn = new Button("OBSTACLE", addImg3);
 		addObstaclebtn.setPrefWidth(btnSize);
 		addObstaclebtn.getStyleClass().add("buttons");
 		// add drone handler
@@ -384,7 +391,7 @@ public class DroneInterface extends Application {
 		});
 
 		// delete entities button
-		ImageView addImg4 = new ImageView(plus);
+		ImageView addImg4 = new ImageView(bin);
 		addImg4.setFitHeight(30);
 		addImg4.setFitWidth(30);
 		Button deleteEntitybtn = new Button("REMOVE ENTITY", addImg4);
@@ -404,43 +411,45 @@ public class DroneInterface extends Application {
 			}
 		});
 
-		HBox btnBox = new HBox(btnAnimOn, btnAnimOff, addEntitiesBtn, addStrEntitiesBtn, addObstaclebtn, deleteEntitybtn);
+		// add protected drone button
+		ImageView addImg5 = new ImageView(plus);
+		addImg5.setFitHeight(30);
+		addImg5.setFitWidth(30);
+		Button addProtecEntitiesBtn = new Button("DECEPTIVE DRONE", addImg5);
+		addProtecEntitiesBtn.setPrefWidth(btnSize);
+		addProtecEntitiesBtn.getStyleClass().add("buttons");
+		// add drone handler
+		addProtecEntitiesBtn.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent event) {
+				scene.setCursor(Cursor.DEFAULT);
+				if (animationOn) {
+					arena.addObject('d');
+				} else {
+					cnv.dialogBox("Start animation", "Please start animation in order to add a deceptive drone");					
+				}
+			}
+		});
+		
+		HBox btnBox = new HBox(btnAnimOn, btnAnimOff, addEntitiesBtn, addStrEntitiesBtn, addProtecEntitiesBtn, addObstaclebtn, deleteEntitybtn);
 		btnBox.getStyleClass().add("button-box");
 		btnBox.setSpacing(10);
 		
 		return btnBox;
 	}
 
-	private VBox setDroneInfoList(ScrollPane scroll) {
-
-		// creating VBox pane
-		rtPane = new VBox();
-		rtPane.getStyleClass().add("drone-info-box");
-		rtPane.setAlignment(Pos.TOP_LEFT);
-		rtPane.setMinWidth(304);
-		rtPane.setMinHeight(canvasHeight - 1);
+	private void updateList(ScrollPane scroll) {
+		// Deleting previous content
+		rtPane.getChildren().clear();
+		rtFullPane.getChildren().clear();
 		
-		// entities list
+		// Refreshing entities list
 		for (int i = 0; i < arena.entities.size(); i++) {
 			Label l = new Label(arena.entities.get(i).toString());
 			l.setTextFill(Color.WHITE);
 			rtPane.getChildren().addAll(l);		
 		}
 
-		// Adding VBox into the scroll pane
-		scroll.setContent(rtPane);
-		scroll.setPrefViewportWidth(290);
-		scroll.setMinViewportWidth(290);
-		scroll.setMinViewportHeight(canvasHeight - 15);
-		scroll.setMaxHeight(canvasHeight);
-		scroll.getStyleClass().add("list-inside");
-
-		VBox list = new VBox(listLabel(), scroll);
-		
-		list.getStyleClass().add("list");
-
-		
-		return list;
+		rtFullPane.getChildren().addAll(title, rtPane);
 	}
 	
 	
@@ -483,7 +492,7 @@ public class DroneInterface extends Application {
 						obstacleButton = false;
 						
 						// Updating drone list
-						bp.setRight(setDroneInfoList(scroll));
+						updateList(scroll);
 					} else {
 						cnv.dialogBox("Occupied space", "Please place the obstacle in an unoccupied area.");
 					}
@@ -500,7 +509,7 @@ public class DroneInterface extends Application {
 							arena.drawObjects(cnv, gc);
 							
 							// Updating drone list
-							bp.setRight(setDroneInfoList(scroll));
+							updateList(scroll);
 							break;
 						}
 					}
@@ -545,6 +554,20 @@ public class DroneInterface extends Application {
 		return title;
 	}
 
+	/**
+	 * Label for the entity list
+	 * @return
+	 */
+	private VBox InitialisingRTPane() {
+		rtPane = new VBox();
+		rtPane.getStyleClass().add("drone-info-box");
+		rtPane.setAlignment(Pos.TOP_LEFT);
+		rtPane.setMinWidth(304);
+		rtPane.setMinHeight(canvasHeight - 1);
+		
+		return rtPane;
+	}
+
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		// primary stage properties
@@ -554,20 +577,25 @@ public class DroneInterface extends Application {
 		// initialising group, border/scroll panes, scene, canvas and arena
 		Group root = new Group();
 		BorderPane bp = new BorderPane();
-		ScrollPane scroll = new ScrollPane();
 		Canvas canvas = new Canvas(canvasWidth, canvasHeight);
 		Scene scene = new Scene(bp, canvasWidth * 1.3, canvasHeight * 1.3);
 		
+		// Including css
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 
 		gc = canvas.getGraphicsContext2D();
+		InitialisingRTPane();
+		rtFullPane = new VBox();
+		rtFullPane.getStyleClass().add("list");
+		scroll = new ScrollPane();
 		cnv = new UICanvas(gc, canvasWidth, canvasHeight);
 		arena = new DroneArena(canvasWidth, canvasHeight);
+		title = listLabel();
 		
 		// Placing elements into right places in border pane
 		bp.setTop(setMenu());
 		bp.setCenter(setCanvas(root));
-		bp.setRight(setDroneInfoList(scroll));
+		bp.setRight(rtFullPane);
 		bp.setBottom(setControlButtons(canvas, scene));
 		
 		// Adding canvas into the group
@@ -575,17 +603,16 @@ public class DroneInterface extends Application {
 		mouseEvent(canvas, scroll, bp, scene);
 
 		// Starting animation loop
-//		final long startNanoTime = System.nanoTime();
 		new AnimationTimer() {
 			@Override
 			public void handle(long currentNanoTime) {
 				if (animationOn) {
-//					double time = (currentNanoTime - startNanoTime) / 1000000000.0;
 					arena.drawObjects(cnv, gc);
+					fpsCounter++;
 					arena.update();
-					
+
 					// Updating drone list
-					bp.setRight(setDroneInfoList(scroll));
+					updateList(scroll);
 				}
 			}
 		}.start();
