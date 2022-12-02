@@ -21,11 +21,6 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundImage;
-import javafx.scene.layout.BackgroundPosition;
-import javafx.scene.layout.BackgroundRepeat;
-import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -58,26 +53,7 @@ public class DroneInterface extends Application {
 	private UICanvas cnv;
 	private DroneArena arena;
 	ScrollPane scroll;
-	int fpsCounter = 0;
 	GraphicsContext gc;
-
-//	    		/**
-//	    		 * Creating a new arena
-//	    		 */
-//	    			try {
-//		    			// Taking x, y input
-//		    			System.out.println("Enter x size of the new arena: ");
-//		    			arenaXInput = s.nextInt();
-//		    			s.nextLine();
-//		    			System.out.println("Enter y size of the new arena: ");
-//		    			arenaYInput = s.nextInt();
-//		    			s.nextLine();
-//	    			} catch (InputMismatchException i) {
-//	    				System.out.println("Something went wrong...\n\n");
-//	    				break;
-//	    			}
-//	    			
-//	    			myArena = new DroneArena(arenaXInput, arenaYInput);
 
 	/**
 	 * .txt file extension filter for file loading
@@ -193,7 +169,7 @@ public class DroneInterface extends Application {
 						StrongDrone player = new StrongDrone(Double.parseDouble(playerInfo[0]), Double.parseDouble(playerInfo[1]), Integer.parseInt(playerInfo[2]), Integer.parseInt(playerInfo[3]), Integer.parseInt(playerInfo[4]));
 						arena.entities.add(player);
 					} else if ((int)playerInfo[5].charAt(0) == 100) {	// 100 == 'd'
-						DeceptiveDrone player = new DeceptiveDrone(Double.parseDouble(playerInfo[0]), Double.parseDouble(playerInfo[1]), Integer.parseInt(playerInfo[2]), Integer.parseInt(playerInfo[3]), Integer.parseInt(playerInfo[4]));
+						DestroyerDrone player = new DestroyerDrone(Double.parseDouble(playerInfo[0]), Double.parseDouble(playerInfo[1]), Integer.parseInt(playerInfo[2]), Integer.parseInt(playerInfo[3]), Integer.parseInt(playerInfo[4]));
 						arena.entities.add(player);
 					}
 				}
@@ -233,6 +209,7 @@ public class DroneInterface extends Application {
 			}
 		});
 
+		// On click event
 		mHelp.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent actionEvent) {
@@ -246,6 +223,7 @@ public class DroneInterface extends Application {
 			}
 		});
 
+		// On click event
 		mCredits.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent actionEvent) {
@@ -263,19 +241,23 @@ public class DroneInterface extends Application {
 		MenuItem mSave = new MenuItem("Save As...");
 		MenuItem mOpen = new MenuItem("Open File...");
 		
-		// On click methods
+		// On click method
 		mExit.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent t) {
 				System.exit(0);						// quit program
 			}
 		});
+
+		// On click method
 		mSave.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent t) {
 				writingToFile();					// Save arena
 			}
 		});
+
+		// On click method
 		mOpen.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent t) {
@@ -344,7 +326,7 @@ public class DroneInterface extends Application {
 			public void handle(ActionEvent event) {
 				scene.setCursor(Cursor.DEFAULT);
 				if (animationOn) {
-					arena.addObject('r');					
+					arena.addObject('r');
 				} else {
 					cnv.dialogBox("Start animation", "Please start animation in order to add a drone");
 				}
@@ -411,15 +393,15 @@ public class DroneInterface extends Application {
 			}
 		});
 
-		// add protected drone button
+		// add destroyer drone button
 		ImageView addImg5 = new ImageView(plus);
 		addImg5.setFitHeight(30);
 		addImg5.setFitWidth(30);
-		Button addProtecEntitiesBtn = new Button("DECEPTIVE DRONE", addImg5);
-		addProtecEntitiesBtn.setPrefWidth(btnSize);
-		addProtecEntitiesBtn.getStyleClass().add("buttons");
+		Button addDestroyEntitiesBtn = new Button("DESTROYER DRONE", addImg5);
+		addDestroyEntitiesBtn.setPrefWidth(btnSize);
+		addDestroyEntitiesBtn.getStyleClass().add("buttons");
 		// add drone handler
-		addProtecEntitiesBtn.setOnAction(new EventHandler<ActionEvent>() {
+		addDestroyEntitiesBtn.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
 				scene.setCursor(Cursor.DEFAULT);
 				if (animationOn) {
@@ -430,7 +412,7 @@ public class DroneInterface extends Application {
 			}
 		});
 		
-		HBox btnBox = new HBox(btnAnimOn, btnAnimOff, addEntitiesBtn, addStrEntitiesBtn, addProtecEntitiesBtn, addObstaclebtn, deleteEntitybtn);
+		HBox btnBox = new HBox(btnAnimOn, btnAnimOff, addEntitiesBtn, addStrEntitiesBtn, addDestroyEntitiesBtn, addObstaclebtn, deleteEntitybtn);
 		btnBox.getStyleClass().add("button-box");
 		btnBox.setSpacing(10);
 		
@@ -464,7 +446,7 @@ public class DroneInterface extends Application {
 					cnv.clearCanvas();
 					arena.drawObjects(cnv, gc);
 					Obstacle o = new Obstacle(e.getX() - 20, e.getY() - 20);
-					o.displayPlayer(cnv);
+					o.displayEntity(cnv);
 				}
 				if (!animationOn && deleteButton) {
 					scene.setCursor(Cursor.CROSSHAIR);
@@ -477,6 +459,7 @@ public class DroneInterface extends Application {
 			new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent e) {
+				// if animation is off and trying to add obstacle
 				if (!animationOn && obstacleButton) {
 					boolean isHere = false;
 					// Looking for object in this position
@@ -498,6 +481,7 @@ public class DroneInterface extends Application {
 					}
 				}
 				
+				// if animation is off and trying to delete an entity
 				if (!animationOn && deleteButton) {
 					boolean found = false;
 					// Looking for object in this position
@@ -521,7 +505,7 @@ public class DroneInterface extends Application {
 				scene.setCursor(Cursor.DEFAULT);
 			}});
 	}
-
+	
 	/**
 	 * Placing canvas into VBox element with label
 	 * @param root
@@ -568,6 +552,9 @@ public class DroneInterface extends Application {
 		return rtPane;
 	}
 
+	/**
+	 * Javafx start method
+	 */
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		// primary stage properties
@@ -608,7 +595,6 @@ public class DroneInterface extends Application {
 			public void handle(long currentNanoTime) {
 				if (animationOn) {
 					arena.drawObjects(cnv, gc);
-					fpsCounter++;
 					arena.update();
 
 					// Updating drone list

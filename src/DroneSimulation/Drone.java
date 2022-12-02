@@ -6,8 +6,7 @@ public class Drone extends Entity {				// Drone class
 	private Image drone4, drone3, drone2, drone1;
 
 	/**
-	 * Drone constructor initialising coordinates, deltas, 
-	 * id and direction
+	 * Initialising images, x/y coords, and entity type
 	 * @param X
 	 * @param Y
 	 * @param d
@@ -40,7 +39,7 @@ public class Drone extends Entity {				// Drone class
 	 * abstract method from player rendering drones using UICanvas
 	 * @param c
 	 */
-	public Drone displayPlayer(UICanvas c) {
+	public Drone displayEntity(UICanvas c) {
 		if (health == 4) {
 			c.drawImage(drone4, x, y, entxSize, entySize);
 		} else if (health == 3) {

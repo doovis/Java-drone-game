@@ -5,10 +5,8 @@ import javafx.scene.image.Image;
 public class Obstacle extends Entity {
 	private Image stone;
 
-	
 	/**
-	 * Drone constructor initialising coordinates, deltas, 
-	 * id and direction
+	 * Initialising image, x/y coords, speed, and entity type
 	 * @param X
 	 * @param Y
 	 * @param d
@@ -22,7 +20,7 @@ public class Obstacle extends Entity {
 
 	
 	/**
-	 * Overloaded Drone constructor for file saving method
+	 * Overloaded entity constructor for file saving method
 	 * @param X
 	 * @param Y
 	 * @param Angle
@@ -37,16 +35,16 @@ public class Obstacle extends Entity {
 	}
 
 	/**
-	 * abstract method from player rendering drones using UICanvas
+	 * abstract method from entity for rendering using UICanvas
 	 * @param c
 	 */
-	public Obstacle displayPlayer(UICanvas c) {
+	public Obstacle displayEntity(UICanvas c) {
 		c.drawImage(stone, this.x, this.y, entxSize, entySize);
 		return null;
 	}
 	
 	/**
-	 * info about drone
+	 * info about obstacle
 	 */
 	public String toString() {
 		return "Obstacle " + "\t" + id + " is at " + (int)x + ", " + (int)y;

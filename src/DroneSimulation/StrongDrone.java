@@ -7,8 +7,7 @@ public class StrongDrone extends Entity {
 
 	
 	/**
-	 * Drone constructor initialising coordinates, deltas, 
-	 * id and direction
+	 * Initialising images, x/y coords, and entity type
 	 * @param X
 	 * @param Y
 	 * @param d
@@ -23,7 +22,7 @@ public class StrongDrone extends Entity {
 
 	
 	/**
-	 * Overloaded Drone constructor for file saving method
+	 * Overloaded entity constructor for file saving method
 	 * @param X
 	 * @param Y
 	 * @param Angle
@@ -42,7 +41,7 @@ public class StrongDrone extends Entity {
 	 * abstract method from player rendering drones using UICanvas
 	 * @param c
 	 */
-	public StrongDrone displayPlayer(UICanvas c) {
+	public StrongDrone displayEntity(UICanvas c) {
 		if (this.health == 4) {
 			c.drawImage(drone4, this.x, this.y, entxSize, entySize);
 		} else if (this.health == 3) {

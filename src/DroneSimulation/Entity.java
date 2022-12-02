@@ -9,12 +9,11 @@ public abstract class Entity {
 	protected int id, angle, health, entxSize, entySize, diameter;
 	protected char type;
 	protected Color circleColor;
-	protected String intruder;
-	private static int count = 0;	// Id increment helper
+	protected boolean checked;
+	private static int count = 0;	// Id increment helper static
 	
 	/**
-	 * Drone constructor initialising coordinates, deltas, 
-	 * id and direction
+	 * Drone constructor initialising coordinates, deltas, sizes, health, type, angle, id etc.
 	 * @param X
 	 * @param Y
 	 * @param d
@@ -30,10 +29,10 @@ public abstract class Entity {
 		this.type = Type;
 		this.angle = new Random().nextInt(360);
 		this.id = count++;
+		this.checked = false;
 		
 		if (Type == 'd') {
 			this.diameter = 320;
-			this.intruder = "n";
 			this.circleColor = Color.rgb(0, 0, 0, 0.25);
 		}
 	}
@@ -49,11 +48,11 @@ public abstract class Entity {
 		this.angle = Angle;
 		this.id = ID;
 		this.type = Type;
+		this.checked = false;
 		
 		if (Type == 'd') {
 			this.diameter = 320;
-			this.intruder = "n";
-//			this.circleColor = Color.rgb(0, 0, 0, 0.25);
+			this.circleColor = Color.rgb(0, 0, 0, 0.25);
 		}
 	}
 	
@@ -90,14 +89,6 @@ public abstract class Entity {
 	}
 
 	/**
-	 * set value of angle
-	 * @return angle
-	 */
-	public void setAngle(int Angle) {
-		angle = Angle;
-	}
-
-	/**
 	 * get value of health
 	 * @return health
 	 */
@@ -130,16 +121,6 @@ public abstract class Entity {
 	}
 	
 	/**
-	 * set values of x and y
-	 * @param X
-	 * @param Y
-	 */
-	public void setXY(double X, double Y) {
-		x = X;
-		y = Y;
-	}
-	
-	/**
 	 * Is the drone at this x,y position
 	 * @param sx	x position
 	 * @param sy	y position
@@ -153,6 +134,7 @@ public abstract class Entity {
 		return false;			
 	}
 	
+	// Circle radar collision detection
 	public boolean circleDetection(double sx, double sy, double sangle, int drnXSize, int drnYSize) {
 		// distance between entities on x axis
 		int distanceX = (int)x + (entxSize / 2) - (int)sx + (drnXSize / 2);
@@ -161,16 +143,10 @@ public abstract class Entity {
 		// total distance between entities across both axis
 		int distanceXY = (int)Math.sqrt(distanceX * distanceX + distanceY * distanceY);
 
+		// If drone is crossing the circle boundary
 		if (distanceXY < 160) {
-//			if (type == 'd') {
-//				circleColor = Color.rgb(255, 0, 0, 0.25);
-//				intruder = "y";				
-//			}
 			return true;
 		} else {
-//			if (type == 'd') {
-//				intruder = "n";
-//			}
 			return false;
 		}
 
@@ -215,10 +191,12 @@ public abstract class Entity {
 		if (intersectX < 0 && intersectY < 0) {
 			// if touched left and right sides
 			if (intersectX > intersectY) {
+				// mirroring the angle
 				sangle = 180 - sangle;
 				return 2; // 2 -> || sides collision
 			// if touched upper and bottom sides
 			} else {
+				// mirroring the angle
 				sangle = -sangle;
 				return 1; // 1 -> = sides collision
 			}
@@ -233,33 +211,37 @@ public abstract class Entity {
 	 */
 	public void tryToMove(DroneArena arena) {
 		// object to object collision detection
+		int condition = 0;				// collision type
+		condition = arena.checkPlayerLocation(x, y, angle, entxSize, entySize, id, type);
+		
 		// regular to regular / strong to strong drones
-		if (arena.checkPlayerLocation(x, y, angle, entxSize, entySize, id, type, circleColor) == 1) {
+		if (condition == 1) {
 			this.health = this.health - 1;
 			this.angle = -angle;
-		} else if (arena.checkPlayerLocation(x, y, angle, entxSize, entySize, id, type, circleColor) == 2) {
+		} else if (condition == 2) {
 			this.health = this.health - 1;
 			this.angle = 180 - angle;
 		}
-		
 		// drones to deceptive drones
-		if (arena.checkPlayerLocation(x, y, angle, entxSize, entySize, id, type, circleColor) == 7) {
-			this.angle += 3;
-		} 
+		if (condition == 7) {
+			circleColor = Color.rgb(255, 0, 0, 0.25);
+		} else {
+			circleColor = Color.rgb(0, 0, 0, 0.25);
+		}
 
 		//  strong to regular drones
-		if (arena.checkPlayerLocation(x, y, angle, entxSize, entySize, id, type, circleColor) == 3) {
+		if (condition == 3) {
 			this.health = this.health - 4;
 			this.angle = -angle;
-		} else if (arena.checkPlayerLocation(x, y, angle, entxSize, entySize, id, type, circleColor) == 4) {
+		} else if (condition == 4) {
 			this.health = this.health - 4;
 			this.angle = 180 - angle;
 		}
 		
 		// drones to obstacles
-		if (arena.checkPlayerLocation(x, y, angle, entxSize, entySize, id, type, circleColor) == 5) {
+		if (condition == 5) {
 			this.angle = -angle;
-		} else if (arena.checkPlayerLocation(x, y, angle, entxSize, entySize, id, type, circleColor) == 6) {
+		} else if (condition == 6) {
 			this.angle = 180 - angle;
 		}
 
@@ -278,20 +260,21 @@ public abstract class Entity {
 			this.angle = 180 - angle;
 		}
 		
+		// moving entity
 		this.x += dx * Math.cos((angle * (Math.PI / 180)));
 		this.y += dy * Math.sin((angle * (Math.PI / 180)));
 	}
 	
 	/**
-	 * abstract method for player rendering using UICanvas
+	 * abstract method for entity rendering using UICanvas
 	 * @param c
 	 */
-	public abstract Entity displayPlayer(UICanvas c);
+	public abstract Entity displayEntity(UICanvas c);
 	
 	/**
-	 * info about player
+	 * info about entity
 	 */
 	public String toString() {
-		return "Player " + "\t" + id + " is at " + (int)x + ", " + (int)y + " angle " + (int)(angle % 360) + ", health " + health;
-	}	
+		return "Entity " + "\t" + id + " is at " + (int)x + ", " + (int)y + " angle " + (int)(angle % 360) + ", health " + health;
+	}		
 }

@@ -7,10 +7,16 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
 public class UICanvas {
-	int canvasWidth = 512;
-	int canvasHeight = 512;
+	private int canvasWidth = 512;
+	private int canvasHeight = 512;
 	GraphicsContext gc;
 	
+	/**
+	 * Initialising graphics context and width/height
+	 * @param GC
+	 * @param w
+	 * @param h
+	 */
 	UICanvas(GraphicsContext GC, int w, int h) {
 		gc = GC;
 		canvasWidth = w;
@@ -25,7 +31,7 @@ public class UICanvas {
 	}
 	
 	/**
-	 * Drawing an image in x,y location w,h size
+	 * Drawing an image in x,y location of w,h size
 	 * @param img
 	 * @param x
 	 * @param y
@@ -37,7 +43,7 @@ public class UICanvas {
 	}
 	
 	/**
-	 * Dialog box
+	 * Info dialog box
 	 */
 	public void dialogBox(String title, String message) {
 		Alert alert = new Alert(AlertType.INFORMATION);				// Instantiating dialog box
@@ -48,7 +54,7 @@ public class UICanvas {
 	}
 
 	/**
-	 * Drawing rectangle
+	 * Drawing Oval shape
 	 * @param x
 	 * @param y
 	 * @param xSize
@@ -56,7 +62,7 @@ public class UICanvas {
 	 * @param color
 	 */
 	public void drawOval(int x, int y, int xSize, int ySize, Color color) {
-		gc.setFill(color);
-		gc.fillOval(x, y, xSize, ySize);
+		gc.setFill(color);						// Setting color
+		gc.fillOval(x, y, xSize, ySize);		// Drawing
 	}
 }
