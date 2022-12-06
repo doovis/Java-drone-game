@@ -42,11 +42,11 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
 public class DroneInterface extends Application {
-	int canvasWidth = 1024;
-	int canvasHeight = 576;
-	boolean animationOn = true;
-	boolean deleteButton = false;
-	boolean obstacleButton = false;
+	private int canvasWidth = 1024;
+	private int canvasHeight = 576;
+	private boolean animationOn = true;
+	private boolean deleteButton = false;
+	private boolean obstacleButton = false;
 	private VBox rtPane, rtFullPane;
 	private Text title;
 
@@ -75,7 +75,7 @@ public class DroneInterface extends Application {
 	/**
 	 * Writing to selected file
 	 */
-	public void writingToFile() {
+	private void writingToFile() {
 		JFileChooser Chooser = new JFileChooser();
 		int value = Chooser.showSaveDialog(null);
 		
@@ -120,7 +120,7 @@ public class DroneInterface extends Application {
 	/**
 	 * reading from selected file
 	 */
-	public ArrayList<String> readingFromFile() {
+	private void readingFromFile() {
 		JFileChooser Chooser = new JFileChooser();
 		Chooser.setFileFilter(filter);
 		int value = Chooser.showOpenDialog(null);		// Opening file picker with .txt file extension filter
@@ -184,7 +184,6 @@ public class DroneInterface extends Application {
 		} else {
 			System.out.println("Arena loading was unsuccessful...\n\n");			
 		}
-		return str;
 	}
 	
 	/**
@@ -436,7 +435,7 @@ public class DroneInterface extends Application {
 	
 	
 	// Mouse event handler for obstacle addition
-	public void mouseEvent(Canvas canvas, ScrollPane scroll, BorderPane bp, Scene scene) {
+	private void mouseEvent(Canvas canvas, ScrollPane scroll, BorderPane bp, Scene scene) {
 		// Mouse movement handler
 		canvas.addEventHandler(MouseEvent.MOUSE_MOVED, 
 			new EventHandler<MouseEvent>() {
