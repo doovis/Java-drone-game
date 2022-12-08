@@ -54,23 +54,6 @@ public class DroneInterface extends Application {
 	private DroneArena arena;
 	ScrollPane scroll;
 	GraphicsContext gc;
-
-	/**
-	 * .txt file extension filter for file loading
-	 */
-	FileFilter filter = new FileFilter() {
-		@Override
-		public boolean accept(File f) {
-			if (f.getAbsolutePath().endsWith(".txt")) return true;
-			if (f.isDirectory()) return true;
-			return false;
-		}
-		
-		@Override
-		public String getDescription() {
-			return "txt";
-		}
-	};
 	
 	/**
 	 * Writing to selected file
@@ -185,6 +168,23 @@ public class DroneInterface extends Application {
 			System.out.println("Arena loading was unsuccessful...\n\n");			
 		}
 	}
+	
+	/**
+	 * .txt file extension filter for file loading
+	 */
+	FileFilter filter = new FileFilter() {
+		@Override
+		public boolean accept(File f) {
+			if (f.getAbsolutePath().endsWith(".txt")) return true;
+			if (f.isDirectory()) return true;
+			return false;
+		}
+		
+		@Override
+		public String getDescription() {
+			return "txt";
+		}
+	};
 	
 	/**
 	 * Top menu
